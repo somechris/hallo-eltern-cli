@@ -12,6 +12,7 @@ from datetime import datetime, timezone
 from email.message import EmailMessage
 
 CONFIG_DIR=os.path.join(os.path.expanduser('~'), '.config', 'hallo-eltern-app4email')
+SEEN_IDS={}
 DEFAULT_CONFIG="""
 [api]
 base_url=https://hallo-api.klassenpinnwand.at/edugroup/api/v1
@@ -25,7 +26,21 @@ confirmed-subject-prefix=[confirmed]{{SPACE}}
 
 [base]
 user-agent=hallo-eltern-app4email/0.0.1
-"""
+seen-ids-file={{CONFIG_DIR}}/seen-ids.json
+""".replace('{{CONFIG_DIR}}', CONFIG_DIR)
+
+def load_seen_ids(config):
+    global SEEN_IDS
+    seen_ids_file = config.get('base', 'seen-ids-file')
+    if seen_ids_file and os.path.isfile(seen_ids_file):
+        with open(seen_ids_file, 'r') as f:
+            SEEN_IDS = json.load(f)
+
+def save_seen_ids(config):
+    global SEEN_IDS
+    seen_ids_file = config.get('base', 'seen-ids-file')
+    with open(seen_ids_file, "w") as f:
+        f.write(json.dumps(SEEN_IDS))
 
 def get_api_headers(config, user_id=None, auth_token=None):
     headers = {
@@ -161,8 +176,11 @@ def deliver_email(email, mode):
 
 
 def process_message(message, mode, config):
-    email = convert_message_to_email(message, config)
-    deliver_email(email, mode)
+    id = f"{message['itemid']}-{'confirmed' if 'confirmed_by' in message else 'unconfirmed'}"
+    if id not in SEEN_IDS:
+        email = convert_message_to_email(message, config)
+        deliver_email(email, mode)
+        SEEN_IDS[id] = f"{message['date']}/{message['title']}"
 
 
 def process_data(data, mode, config):
@@ -190,5 +208,9 @@ def parse_arguments():
 if __name__ == '__main__':
     args = parse_arguments()
     config = parse_config(args.config)
+    load_seen_ids(config)
+
     data = get_data(config, args.data_file)
     process_data(data, mode=args.mode, config=config)
+
+    save_seen_ids(config)
