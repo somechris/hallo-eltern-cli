@@ -92,6 +92,10 @@ def get_data(config, data_file):
             pinboard = entry['itemid']
             child_code = entry['code']
             messages = get_api_messages(config, user_id, auth_token, pinboard, child_code)
+            for message in messages:
+                message['child_name'] = entry['title']
+                message['class_name'] = entry['subtitle']
+                message['school_name'] = entry['school']
             data += messages
     return data
 
@@ -126,6 +130,12 @@ def convert_message_to_email(message, config):
     email['X-HalloElternApp-Confirmation-Needed'] = str(message['confirmation'])
     email['X-HalloElternApp-Confirmed'] = 'True' if confirmed else 'False'
     email['X-HalloElternApp-Item-Id'] = message['itemid']
+    if 'child_name' in message:
+        email['X-HalloElternApp-Child-Name'] = message['child_name']
+    if 'class_name' in message:
+        email['X-HalloElternApp-Class-Name'] = message['class_name']
+    if 'school_name' in message:
+        email['X-HalloElternApp-School-Name'] = message['school_name']
 
     email.set_content(message['message'])
 
