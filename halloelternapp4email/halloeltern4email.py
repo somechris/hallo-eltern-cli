@@ -176,16 +176,16 @@ def deliver_email(email, mode):
 
 
 def process_message(message, mode, config):
-    id = f"{message['itemid']}-{'confirmed' if 'confirmed_by' in message else 'unconfirmed'}"
-    if id not in SEEN_IDS:
-        email = convert_message_to_email(message, config)
-        deliver_email(email, mode)
-        SEEN_IDS[id] = f"{message['date']}/{message['title']}"
+    email = convert_message_to_email(message, config)
+    deliver_email(email, mode)
 
 
-def process_data(data, mode, config):
+def process_data(data, mode, config, process_already_seen=False):
     for message in data:
-        process_message(message, mode, config)
+        id = f"{message['itemid']}-{'confirmed' if 'confirmed_by' in message else 'unconfirmed'}"
+        if id not in SEEN_IDS or process_already_seen:
+            process_message(message, mode, config)
+            SEEN_IDS[id] = f"{message['date']}/{message['title']}"
 
 
 def parse_config(config_file):
@@ -201,6 +201,7 @@ def parse_arguments():
     parser.add_argument('--mode', default='stdout', choices=['procmail', 'stdout'], help='where to pipe generated emails to')
     parser.add_argument('--config', default=os.path.join(CONFIG_DIR, 'config'), help='path to config file')
     parser.add_argument('--data-file', help='load message data from this file instead of querying the live API instance')
+    parser.add_argument('--process-all', action='store_true', help='process all (even already seen) messages')
 
     return parser.parse_args()
 
@@ -211,6 +212,6 @@ if __name__ == '__main__':
     load_seen_ids(config)
 
     data = get_data(config, args.data_file)
-    process_data(data, mode=args.mode, config=config)
+    process_data(data, mode=args.mode, config=config, process_already_seen=args.process_all)
 
     save_seen_ids(config)
