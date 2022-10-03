@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import json
 import socket
 import subprocess
@@ -38,23 +39,42 @@ def convert_message_to_email(message):
     return email
 
 
-def deliver_email(email):
+def deliver_email_procmail(email):
             subprocess.run(["/usr/bin/procmail"],
                            input=str(email),
                            text=True,
                            check=True)
 
 
-def process_message(message):
+def deliver_email_stdout(email):
+    print(email)
+
+
+def deliver_email(email, mode):
+    if mode == 'procmail':
+        deliver_email_procmail(email)
+    else:
+        deliver_email_stdout(email)
+
+
+def process_message(message, mode):
     email = convert_message_to_email(message)
-    deliver_email(email)
+    deliver_email(email, mode)
 
 
-def process_data(data):
+def process_data(data, mode):
     for message in data:
-        process_message(message)
+        process_message(message, mode)
+
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(description='Turn messages from Hallo-Eltern-App into email')
+    parser.add_argument('--mode', default='stdout', choices=['procmail', 'stdout'], help='where to pipe generated emails to')
+
+    return parser.parse_args()
 
 
 if __name__ == '__main__':
+    args = parse_arguments()
     data = get_data()
-    process_data(data)
+    process_data(data, mode=args.mode)
