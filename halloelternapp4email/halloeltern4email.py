@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
 
 import argparse
+import configparser
 import json
+import os
 import socket
 import subprocess
 
 from datetime import datetime, timezone
 from email.message import EmailMessage
 
-DUMMY_DOMAIN='example.org'
-DUMMY_LOCAL_PART='hallo-eltern-app'
-DUMMY_EMAIL_ADDRESS=DUMMY_LOCAL_PART + '@' + DUMMY_DOMAIN
+CONFIG_DIR=os.path.join(os.path.expanduser('~'), '.config', 'hallo-eltern-app4email')
+DEFAULT_CONFIG="""
+[email]
+from=hallo-eltern-app@example.org
+to=${email:from}
+"""
 
 def get_data():
     with open('hea.json', 'r') as f:
@@ -18,16 +23,16 @@ def get_data():
     return data['listresponse']
 
 
-def convert_message_to_email(message):
+def convert_message_to_email(message, config):
     now = datetime.now(timezone.utc)
 
     email = EmailMessage()
-    email['From'] = f"{message['sender']['title']} <{DUMMY_EMAIL_ADDRESS}>"
-    email['To'] = f"{DUMMY_EMAIL_ADDRESS}"
+    email['From'] = f"{message['sender']['title']} <{config.get('email', 'from')}>"
+    email['To'] = f"{config.get('email', 'to')}"
     email['Subject'] = message['title']
     email['Date'] = datetime.fromisoformat(message['date'][0:22] + ':00')
-    email['Received'] = f' from Hallo-Eltern-App with hallo-eltern-app4email by {socket.getfqdn()} for <{DUMMY_EMAIL_ADDRESS}>; {now}'
-    email['Message-ID'] = f"<message-id-{message['itemid']}-{'confirmed' if 'confirmed_by' in message else 'unconfirmed'}@{DUMMY_DOMAIN}"
+    email['Received'] = f" from Hallo-Eltern-App with hallo-eltern-app4email by {socket.getfqdn()} for <{config.get('email', 'to')}>; {now}"
+    email['Message-ID'] = f"<message-id-{message['itemid']}-{'confirmed' if 'confirmed_by' in message else 'unconfirmed'}@{config.get('email', 'from').rsplit('@', 1)[1]}"
 
     email['X-HalloElternApp-Sender-Id'] = message['sender']['itemid']
     email['X-HalloElternApp-Confirmation-Needed'] = str(message['confirmation'])
@@ -57,24 +62,34 @@ def deliver_email(email, mode):
         deliver_email_stdout(email)
 
 
-def process_message(message, mode):
-    email = convert_message_to_email(message)
+def process_message(message, mode, config):
+    email = convert_message_to_email(message, config)
     deliver_email(email, mode)
 
 
-def process_data(data, mode):
+def process_data(data, mode, config):
     for message in data:
-        process_message(message, mode)
+        process_message(message, mode, config)
+
+
+def parse_config(config_file):
+    config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
+    config.read_string(DEFAULT_CONFIG)
+    if os.path.isfile(config_file):
+        config.read(config_file)
+    return config
 
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Turn messages from Hallo-Eltern-App into email')
     parser.add_argument('--mode', default='stdout', choices=['procmail', 'stdout'], help='where to pipe generated emails to')
+    parser.add_argument('--config', default=os.path.join(CONFIG_DIR, 'config'), help='path to config file')
 
     return parser.parse_args()
 
 
 if __name__ == '__main__':
     args = parse_arguments()
+    config = parse_config(args.config)
     data = get_data()
-    process_data(data, mode=args.mode)
+    process_data(data, mode=args.mode, config=config)
