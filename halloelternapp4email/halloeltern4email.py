@@ -41,5 +41,4 @@ def process_data(data):
 
 if __name__ == '__main__':
     data = get_data()
-    print(data)
     process_data(data)
