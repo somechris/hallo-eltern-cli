@@ -39,7 +39,7 @@ def convert_message_to_email(message, config):
     email['To'] = f"{config.get('email', 'to')}"
     email['Subject'] = (config.get('email', 'confirmed_subject_prefix').replace('{{SPACE}}', ' ') if confirmed else '') + message['title'] 
     email['Date'] = datetime.fromisoformat(message['date'][0:22] + ':00')
-    email['Received'] = f" from Hallo-Eltern-App with hallo-eltern-app4email by {socket.getfqdn()} for <{config.get('email', 'to')}>; {now}"
+    email['Received'] = f"from Hallo-Eltern-App with hallo-eltern-app4email by {socket.getfqdn()} for <{config.get('email', 'to')}>; {now}"
     email['Message-ID'] = get_message_id(message, config, confirmed=confirmed)
     email['User-Agent'] = f"hallo-eltern-app4email/{__version__}"
 
