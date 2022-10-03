@@ -2,6 +2,7 @@
 
 import json
 import socket
+import subprocess
 
 from datetime import datetime, timezone
 from email.message import EmailMessage
@@ -37,9 +38,16 @@ def convert_message_to_email(message):
     return email
 
 
+def deliver_email(email):
+            subprocess.run(["/usr/bin/procmail"],
+                           input=str(email),
+                           text=True,
+                           check=True)
+
+
 def process_message(message):
     email = convert_message_to_email(message)
-    print(email)
+    deliver_email(email)
 
 
 def process_data(data):
