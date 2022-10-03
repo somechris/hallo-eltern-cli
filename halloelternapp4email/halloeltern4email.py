@@ -10,6 +10,8 @@ import subprocess
 from datetime import datetime, timezone
 from email.message import EmailMessage
 
+__version__ = '0.0.1'
+
 CONFIG_DIR=os.path.join(os.path.expanduser('~'), '.config', 'hallo-eltern-app4email')
 DEFAULT_CONFIG="""
 [email]
@@ -33,6 +35,7 @@ def convert_message_to_email(message, config):
     email['Date'] = datetime.fromisoformat(message['date'][0:22] + ':00')
     email['Received'] = f" from Hallo-Eltern-App with hallo-eltern-app4email by {socket.getfqdn()} for <{config.get('email', 'to')}>; {now}"
     email['Message-ID'] = f"<message-id-{message['itemid']}-{'confirmed' if 'confirmed_by' in message else 'unconfirmed'}@{config.get('email', 'from').rsplit('@', 1)[1]}"
+    email['User-Agent'] = f"hallo-eltern-app4email/{__version__}"
 
     email['X-HalloElternApp-Sender-Id'] = message['sender']['itemid']
     email['X-HalloElternApp-Confirmation-Needed'] = str(message['confirmation'])
