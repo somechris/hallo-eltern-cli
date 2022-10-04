@@ -20,8 +20,7 @@ email=foo@example.org
 password=bar
 
 [email]
-from=hallo-eltern-app@example.org
-to=${email:from}
+default-address=do-not-reply@example.org
 confirmed-subject-prefix=[confirmed]{{SPACE}}
 
 [base]
@@ -63,7 +62,9 @@ def get_api_access_tokens(config):
 
     response = requests.post(config.get('api', 'base_url') + '/account/login', headers=headers)
     result = response.json()['detailresponse']
-    return (result['userid'], result['auth_token'])
+    userdata = result['userdata']
+    name = f"{userdata['firstname']} {userdata['lastname']}"
+    return (result['userid'], result['auth_token'], name, userdata['mail'])
 
 
 def get_api_pinboards(config, user_id, auth_token):
@@ -100,7 +101,7 @@ def get_data(config, data_file):
         with open(data_file, 'r') as f:
             data = json.load(f)['listresponse']
     else:
-        (user_id, auth_token) = get_api_access_tokens(config)
+        (user_id, auth_token, user_name, user_email) = get_api_access_tokens(config)
         pinboard_entries = get_api_pinboards(config, user_id, auth_token)
         data = []
         for entry in pinboard_entries:
@@ -111,12 +112,14 @@ def get_data(config, data_file):
                 message['child_name'] = entry['title']
                 message['class_name'] = entry['subtitle']
                 message['school_name'] = entry['school']
+                message['user_name'] = user_name
+                message['user_email'] = user_email
             data += messages
     return data
 
 
 def get_message_id(message, config, confirmed=False):
-    return f"<message-id-{message['itemid']}-{'confirmed' if confirmed else 'unconfirmed'}@{config.get('email', 'from').rsplit('@', 1)[1]}>"
+    return f"<message-id-{message['itemid']}-{'confirmed' if confirmed else 'unconfirmed'}@{config.get('email', 'default-address').rsplit('@', 1)[1]}>"
 
 
 def get_datetime():
@@ -128,11 +131,18 @@ def convert_message_to_email(message, config):
     confirmed = 'confirmed_by' in message
 
     email = EmailMessage()
-    email['From'] = f"{message['sender']['title']} <{config.get('email', 'from')}>"
-    email['To'] = f"{config.get('email', 'to')}"
+    if message['received']:
+        from_header = f"{message['sender']['title']} <{config.get('email', 'default-address')}>"
+        to_header = f"{message['user_name']} <{message['user_email']}>"
+    else:
+        from_header = f"{message['user_name']} <{message['user_email']}>"
+        to_header = ', '.join([f"{receiver['title']} <{message['user_email']}>" for receiver in message['selected_receivers']])
+
+    email['From'] = from_header
+    email['To'] = to_header
     email['Subject'] = (config.get('email', 'confirmed-subject-prefix').replace('{{SPACE}}', ' ') if confirmed else '') + message['title'] 
     email['Date'] = datetime.fromisoformat(message['date'][0:22] + ':00')
-    email['Received'] = f"from Hallo-Eltern-App with hallo-eltern-app4email by {socket.getfqdn()} for <{config.get('email', 'to')}>; {now}"
+    email['Received'] = f"from Hallo-Eltern-App with hallo-eltern-app4email by {socket.getfqdn()} for <{message['user_email']}>; {now}"
     email['Message-ID'] = get_message_id(message, config, confirmed=confirmed)
     email['User-Agent'] = config.get('base', 'user-agent')
 
