@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 
 logger = logging.getLogger(__name__)
 
+
 class Api(object):
     def __init__(self, config):
         self._config = config
@@ -22,7 +23,8 @@ class Api(object):
             ret['mogree-Access-Id'] = str(self._login_response['userid'])
 
         if 'auth_token' in self._login_response:
-            ret['Cookie'] = f"mogree-Access-Token-Parent={self._login_response['auth_token']}"
+            auth_token = self._login_response['auth_token']
+            ret['Cookie'] = f"mogree-Access-Token-Parent={auth_token}"
 
         if custom_headers:
             for k, v in custom_headers.items():
@@ -32,7 +34,8 @@ class Api(object):
     def get_timestamp(self):
         return int(datetime.now(timezone.utc).timestamp())
 
-    def _request(self, method, path, headers={}, parameters={}, authenticated=True):
+    def _request(self, method, path, headers={}, parameters={},
+                 authenticated=True):
         if authenticated and not self._login_response:
             self.authenticate()
 
@@ -40,20 +43,18 @@ class Api(object):
 
         headers = self._compute_headers(custom_headers=headers)
 
-        response_raw = None
-        if method == 'GET':
-            response_raw = requests.get(url, headers=headers, params=parameters)
-        elif method == 'POST':
-            response_raw = requests.post(url, headers=headers, params=parameters)
-        else:
-            raise RuntimeError(f'Unknown method "{method}"')
+        response_raw = method(url, headers=headers, params=parameters)
 
-        logger.debug(f'api request to url: {url}\nheaders: {headers}\nparameters: {parameters}\nresponse status code: {response_raw.status_code}\nresponse:\n{response_raw.content.decode()}')
+        logger.debug(f'api request to url: {url}\nheaders: {headers}\n'
+                     f'parameters: {parameters}\n'
+                     f'response status code: {response_raw.status_code}\n'
+                     f'response:\n{response_raw.content.decode()}')
 
         response = response_raw.json()
 
         if response['statuscode'] != 200:
-            raise RuntimeError(f"statuscode was {response['statuscode']} instead of 200")
+            raise RuntimeError(
+                f"status code was {response['statuscode']} instead of 200")
 
         ret = None
         response_type = response['response_type']
@@ -67,10 +68,14 @@ class Api(object):
         return ret
 
     def _get(self, path, headers={}, parameters={}, authenticated=True):
-        return self._request('GET', path, headers=headers, parameters=parameters, authenticated=authenticated)
+        return self._request(
+            requests.get, path, headers=headers, parameters=parameters,
+            authenticated=authenticated)
 
     def _post(self, path, headers={}, parameters={}, authenticated=True):
-        return self._request('POST', path, headers=headers, parameters=parameters, authenticated=authenticated)
+        return self._request(
+            requests.post, path, headers=headers, parameters=parameters,
+            authenticated=authenticated)
 
     def authenticate(self):
         self._login_response = {}
@@ -79,11 +84,13 @@ class Api(object):
             'password': self._get_config('password'),
             }
 
-        self._login_response = self._post('/account/login', headers=headers, authenticated=False)
+        self._login_response = self._post(
+            '/account/login', headers=headers, authenticated=False)
 
     def get_authenticated_user(self):
         userdata = self._login_response['userdata']
-        return f"{userdata['firstname']} {userdata['lastname']} <{userdata['mail']}>"
+        return (f"{userdata['firstname']} {userdata['lastname']} "
+                f"<{userdata['mail']}>")
 
     def list_pinboards(self):
         return self._get('/pinboard')
@@ -104,5 +111,7 @@ class Api(object):
         authenticated = bool(self._login_response)
         suffix = ''
         if authenticated:
-            suffix = f", user: {self._login_response['userdata']['firstname']} {self._login_response['userdata']['lastname']} <{self._login_response['userdata']['mail']}> (id:{self._login_response['userdata']['itemid']})"
-        return f"halloelternapp4email.Api(authenticated={authenticated}{suffix})"
+            suffix = (f", user: {self.get_authenticated_user} "
+                      "(id:{self._login_response['userdata']['itemid']})")
+        return \
+            f"halloelternapp4email.Api(authenticated={authenticated}{suffix})"

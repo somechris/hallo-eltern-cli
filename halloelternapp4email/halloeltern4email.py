@@ -11,9 +11,10 @@ import messagetoemailconverter
 import procmailmda
 import stdoutmda
 
-CONFIG_DIR=os.path.join(os.path.expanduser('~'), '.config', 'hallo-eltern-app4email')
-SEEN_IDS={}
-DEFAULT_CONFIG="""
+CONFIG_DIR = os.path.join(
+    os.path.expanduser('~'), '.config', 'hallo-eltern-app4email')
+SEEN_IDS = {}
+DEFAULT_CONFIG = """
 [api]
 email=foo@example.org
 password=bar
@@ -35,8 +36,10 @@ LOG_DATE_FORMAT = '%Y-%m-%dT%H:%M:%S'
 logging.basicConfig(format=LOG_FORMAT, datefmt=LOG_DATE_FORMAT)
 logger = logging.getLogger(__name__)
 
+
 def parse_config(config_file):
-    config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
+    interpolation = configparser.ExtendedInterpolation()
+    config = configparser.ConfigParser(interpolation=interpolation)
     config.read_string(DEFAULT_CONFIG)
     if os.path.isfile(config_file):
         config.read(config_file)
@@ -44,35 +47,53 @@ def parse_config(config_file):
 
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(description='Turn messages from Hallo-Eltern-App into email')
-    parser.add_argument('--mode', default='stdout', choices=['procmail', 'stdout'], help='where to pipe generated emails to')
-    parser.add_argument('--config', default=os.path.join(CONFIG_DIR, 'config'), help='path to config file')
-    parser.add_argument('--data-file', help='load message data from this file instead of querying the live API instance')
-    parser.add_argument('--process-all', action='store_true', help='process all (even already seen) messages')
-    parser.add_argument('--verbose', '-v', action='count', default=0, help='increase verbosity')
+    parser = argparse.ArgumentParser(
+        description='Turn messages from Hallo-Eltern-App into email')
+    parser.add_argument('--mode',
+                        default='stdout',
+                        choices=['procmail', 'stdout'],
+                        help='where to pipe generated emails to')
+    parser.add_argument('--config',
+                        default=os.path.join(CONFIG_DIR, 'config'),
+                        help='path to config file')
+    parser.add_argument('--data-file',
+                        help='load message data from this file instead of '
+                        'querying the live API instance')
+    parser.add_argument('--process-all',
+                        action='store_true',
+                        help='process all (even already seen) messages')
+    parser.add_argument('--verbose', '-v',
+                        default=0,
+                        action='count',
+                        help='increase verbosity')
 
     args = parser.parse_args()
 
     if args.verbose > 0:
-            logging.getLogger().setLevel(logging.DEBUG)
-            logger.debug('Running in debug mode')
+        logging.getLogger().setLevel(logging.DEBUG)
+        logger.debug('Running in debug mode')
 
     return args
+
 
 class HalloElternApp4Email(object):
     def __init__(self, config):
         self._config = config
         self._api = api.Api(self._config)
-        self._seen_ids_store = idstore.IdStore(config.get('base', 'seen-ids-file'))
+        seen_ids_file = config.get('base', 'seen-ids-file')
+        self._seen_ids_store = idstore.IdStore(seen_ids_file)
 
     def run(self, mda, process_all=False):
-        converter = messagetoemailconverter.MessageToEmailConverter(self._config)
+        converter = messagetoemailconverter.MessageToEmailConverter(
+            self._config)
         for pinboard in self._api.list_pinboards():
-            pinboard_id=pinboard['itemid']
+            pinboard_id = pinboard['itemid']
             child_code = pinboard['code']
 
             for message in self._api.list_messages(pinboard_id, child_code):
-                id = f"{message['itemid']}-{'confirmed' if 'confirmed_by' in message else 'unconfirmed'}"
+                confirmed_status = 'confirmed' if 'confirmed_by' in message \
+                    else 'unconfirmed'
+                id = f"{message['itemid']}-{confirmed_status}"
                 if process_all or not self._seen_ids_store.has_been_seen(id):
                     email = converter.convert(message, {
                             'pinboard_id': pinboard_id,
@@ -80,10 +101,12 @@ class HalloElternApp4Email(object):
                             'class_name': pinboard['subtitle'],
                             'child_name': pinboard['title'],
                             'child_code': child_code,
-                            'logged_in_user': self._api.get_authenticated_user(),
+                            'logged_in_user':
+                            self._api.get_authenticated_user(),
                             })
                     mda.deliver(email)
             self._seen_ids_store.persist()
+
 
 if __name__ == '__main__':
     args = parse_arguments()

@@ -2,6 +2,7 @@ import subprocess
 
 import mda
 
+
 class ProcmailMDA(mda.MDA):
     def deliver(self, message):
         subprocess.run(["/usr/bin/procmail"],

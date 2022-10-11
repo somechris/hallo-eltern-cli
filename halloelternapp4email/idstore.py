@@ -1,6 +1,7 @@
 import json
 import os
 
+
 class IdStore(object):
     def __init__(self, file):
         self._file = file
