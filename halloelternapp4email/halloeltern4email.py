@@ -85,7 +85,7 @@ class HalloElternApp4Email(object):
 
     def run(self, mda, process_all=False):
         converter = messagetoemailconverter.MessageToEmailConverter(
-            self._config)
+            self._config, self._api.get_authenticated_user())
         for pinboard in self._api.list_pinboards():
             pinboard_id = pinboard['itemid']
             child_code = pinboard['code']
@@ -101,8 +101,6 @@ class HalloElternApp4Email(object):
                             'class_name': pinboard['subtitle'],
                             'child_name': pinboard['title'],
                             'child_code': child_code,
-                            'logged_in_user':
-                            self._api.get_authenticated_user(),
                             })
                     mda.deliver(email)
             self._seen_ids_store.persist()

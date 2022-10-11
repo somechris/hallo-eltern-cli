@@ -88,9 +88,9 @@ class Api(object):
             '/account/login', headers=headers, authenticated=False)
 
     def get_authenticated_user(self):
-        userdata = self._login_response['userdata']
-        return (f"{userdata['firstname']} {userdata['lastname']} "
-                f"<{userdata['mail']}>")
+        if not self._login_response:
+            self.authenticate()
+        return self._login_response['userdata']
 
     def list_pinboards(self):
         return self._get('/pinboard')
@@ -111,7 +111,7 @@ class Api(object):
         authenticated = bool(self._login_response)
         suffix = ''
         if authenticated:
-            suffix = (f", user: {self.get_authenticated_user} "
-                      "(id:{self._login_response['userdata']['itemid']})")
+            userdata = self._login_response['userdata']
+            suffix = f", user: {userdata['mail']}, id:{userdata['id']}"
         return \
             f"halloelternapp4email.Api(authenticated={authenticated}{suffix})"

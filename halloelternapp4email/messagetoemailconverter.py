@@ -5,56 +5,75 @@ from email.message import EmailMessage
 
 
 class MessageToEmailConverter(object):
-    def __init__(self, config):
+    def __init__(self, config, authenticated_user):
         self._config = config
+        self._message_id_domain = self._config.get('email', 'default-address')\
+            .rsplit('@', 1)[1]
+        self._authenticated_user = authenticated_user
 
     def get_datetime(self):
         return datetime.now(timezone.utc)
 
-    def get_message_id(self, message, config, confirmed=False):
-        domain = config.get('email', 'default-address').rsplit('@', 1)[1]
+    def get_message_id(self, message, confirmed=False):
         ret = f"<message-id-{message['itemid']}-"
         ret += 'confirmed' if confirmed else 'unconfirmed'
-        ret += f"@{domain}>"
+        ret += f"@{self._message_id_domain}>"
         return ret
 
-    def convert(self, message, extra_data):
-        now = self.get_datetime()
-        confirmed = 'confirmed_by' in message
-        authenticated_user = extra_data['logged_in_user']
-        default_address = self._config.get('email', 'default-address')
-
-        email = EmailMessage()
-
-        if message['received']:
-            from_header = f"{message['sender']['title']} <{default_address}>"
-            to_header = authenticated_user
+    def _format_person(self, data):
+        name = None
+        address = None
+        if data['itemid'] == self._authenticated_user['itemid']:
+            first_name = self._authenticated_user['firstname']
+            last_name = self._authenticated_user['lastname']
+            name = f'{first_name} {last_name}'
+            address = self._authenticated_user['mail']
         else:
-            from_header = authenticated_user
-            to_header = ', '.join([
-                    f"{receiver['title']} <{default_address}>"
-                    for receiver in message['selected_receivers']])
+            name = data['title']
+            address = self._config.get('email', 'default-address')
+        return f'{name} <{address}>'
 
-        email['From'] = from_header
-        email['To'] = to_header
-        subject = message['title']
+    def _build_to_header(self, message):
+        receivers = ''
+        if message['received']:
+            receivers = [self._authenticated_user]
+        else:
+            receivers = message['selected_receivers']
+
+        return ', '.join([self._format_person(receiver)
+                          for receiver in receivers])
+
+    def _build_subject_header(self, message, confirmed):
+        ret = message['title']
         if confirmed:
             prefix = self._config.get('email', 'confirmed-subject-prefix')
             prefix = prefix.replace('{{SPACE}}', ' ')
-            subject = prefix + subject
-        email['Subject'] = subject
+            ret = prefix + ret
+        return ret
+
+    def _build_received_header(self):
+        now = self.get_datetime()
+        address = self._authenticated_user['mail']
+        return ('from Hallo-Eltern-App with hallo-eltern-app4email by '
+                f"{socket.getfqdn()} for <{address}>; "
+                f"{now}")
+
+    def convert(self, message, extra_data):
+        confirmed = 'confirmed_by' in message
+
+        email = EmailMessage()
+
+        email['From'] = self._format_person(message['sender'])
+        email['To'] = self._build_to_header(message)
+        email['Subject'] = self._build_subject_header(message, confirmed)
         email['Date'] = datetime.fromisoformat(message['date'][0:22] + ':00')
-        email['Received'] = \
-            ('from Hallo-Eltern-App with hallo-eltern-app4email by '
-             f"{socket.getfqdn()} for {authenticated_user.rsplit(' ', 1)[1]}; "
-             f"{now}")
-        email['Message-ID'] = self.get_message_id(
-            message, self._config, confirmed=confirmed)
+        email['Received'] = self._build_received_header()
+        email['Message-ID'] = self.get_message_id(message, confirmed=confirmed)
         email['User-Agent'] = self._config.get('api', 'user-agent')
 
         if confirmed:
             unconfirmed_message_id = self.get_message_id(
-                message, self._config, confirmed=False)
+                message, confirmed=False)
             email['In-Reply-To'] = unconfirmed_message_id
             email['References'] = unconfirmed_message_id
 
