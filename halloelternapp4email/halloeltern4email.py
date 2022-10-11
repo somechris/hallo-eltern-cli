@@ -2,6 +2,7 @@
 
 import argparse
 import configparser
+import logging
 import os
 
 import api
@@ -28,6 +29,11 @@ seen-ids-file={{CONFIG_DIR}}/seen-ids.json
 """.replace('{{CONFIG_DIR}}', CONFIG_DIR)
 
 
+LOG_FORMAT = ('%(asctime)s.%(msecs)03d %(levelname)-5s [%(threadName)s] '
+              '%(filename)s:%(lineno)d - %(message)s')
+LOG_DATE_FORMAT = '%Y-%m-%dT%H:%M:%S'
+logging.basicConfig(format=LOG_FORMAT, datefmt=LOG_DATE_FORMAT)
+logger = logging.getLogger(__name__)
 
 def parse_config(config_file):
     config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
@@ -43,8 +49,15 @@ def parse_arguments():
     parser.add_argument('--config', default=os.path.join(CONFIG_DIR, 'config'), help='path to config file')
     parser.add_argument('--data-file', help='load message data from this file instead of querying the live API instance')
     parser.add_argument('--process-all', action='store_true', help='process all (even already seen) messages')
+    parser.add_argument('--verbose', '-v', action='count', default=0, help='increase verbosity')
 
-    return parser.parse_args()
+    args = parser.parse_args()
+
+    if args.verbose > 0:
+            logging.getLogger().setLevel(logging.DEBUG)
+            logger.debug('Running in debug mode')
+
+    return args
 
 class HalloElternApp4Email(object):
     def __init__(self, config):

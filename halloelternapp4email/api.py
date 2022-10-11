@@ -1,6 +1,9 @@
 import requests
+import logging
 
 from datetime import datetime, timezone
+
+logger = logging.getLogger(__name__)
 
 class Api(object):
     def __init__(self, config):
@@ -44,6 +47,8 @@ class Api(object):
             response_raw = requests.post(url, headers=headers, params=parameters)
         else:
             raise RuntimeError(f'Unknown method "{method}"')
+
+        logger.debug(f'api request to url: {url}\nheaders: {headers}\nparameters: {parameters}\nresponse status code: {response_raw.status_code}\nresponse:\n{response_raw.content.decode()}')
 
         response = response_raw.json()
 
