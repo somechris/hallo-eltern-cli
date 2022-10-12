@@ -114,4 +114,4 @@ class Api(object):
             userdata = self._login_response['userdata']
             suffix = f", user: {userdata['mail']}, id:{userdata['id']}"
         return \
-            f"halloelternapp4email.Api(authenticated={authenticated}{suffix})"
+            f"halloelternappcli.Api(authenticated={authenticated}{suffix})"

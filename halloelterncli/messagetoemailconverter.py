@@ -54,7 +54,7 @@ class MessageToEmailConverter(object):
     def _build_received_header(self):
         now = self.get_datetime()
         address = self._authenticated_user['mail']
-        return ('from Hallo-Eltern-App with hallo-eltern-app4email by '
+        return ('from Hallo-Eltern-App with hallo-eltern-cli by '
                 f"{socket.getfqdn()} for <{address}>; "
                 f"{now}")
 

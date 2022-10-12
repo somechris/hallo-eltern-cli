@@ -12,14 +12,14 @@ import procmailmda
 import stdoutmda
 
 CONFIG_DIR = os.path.join(
-    os.path.expanduser('~'), '.config', 'hallo-eltern-app4email')
+    os.path.expanduser('~'), '.config', 'hallo-eltern-cli')
 SEEN_IDS = {}
 DEFAULT_CONFIG = """
 [api]
 email=foo@example.org
 password=bar
 base_url=https://hallo-api.klassenpinnwand.at/edugroup/api/v1
-user-agent=hallo-eltern-app4email/0.0.1
+user-agent=hallo-eltern-cli/0.0.1
 
 [email]
 default-address=do-not-reply@example.org
