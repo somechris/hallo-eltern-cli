@@ -5,6 +5,8 @@ import os
 
 CONFIG_DIR = os.path.join(
     os.path.expanduser('~'), '.config', 'hallo-eltern-cli')
+CACHE_DIR = os.path.join(
+    os.path.expanduser('~'), '.cache', 'hallo-eltern-cli')
 CONFIG_FILE = None
 DEFAULT_CONFIG = """
 [api]
@@ -19,7 +21,11 @@ confirmed-subject-prefix=[confirmed]{{SPACE}}
 
 [base]
 seen-ids-file={{CONFIG_DIR}}/seen-ids.json
-""".replace('{{CONFIG_DIR}}', CONFIG_DIR)
+
+[development]
+development-mode=False
+cache-dir={{CACHE_DIR}}/api-development
+""".replace('{{CONFIG_DIR}}', CONFIG_DIR).replace('{{CACHE_DIR}}', CACHE_DIR)
 
 
 LOG_FORMAT = ('%(asctime)s.%(msecs)03d %(levelname)-5s [%(threadName)s] '

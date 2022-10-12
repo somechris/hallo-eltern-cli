@@ -1,3 +1,7 @@
+import copy
+import json
+import os
+import re
 import requests
 import logging
 
@@ -34,6 +38,68 @@ class Api(object):
     def get_timestamp(self):
         return int(datetime.now(timezone.utc).timestamp())
 
+    def _raw_request(self, method, url, headers, parameters):
+        logger.debug(f'api request {method} to url: {url}\n'
+                     f'headers: {headers}\n'
+                     f'parameters: {parameters}')
+
+        if method == 'GET':
+            requests_method = requests.get
+        elif method == 'POST':
+            requests_method = requests.post
+        else:
+            raise RuntimeError(f"Unknown method '{method}'")
+
+        response = requests_method(url, headers=headers, params=parameters)
+
+        logger.debug(f'response status code: {response.status_code}\n'
+                     f'response:\n{response.content.decode()}')
+
+        return response.content
+
+    def _cache_filled_raw_request(self, method, url, headers, parameters):
+        cache_dir = self._config.get('development', 'cache-dir')
+        headers_clone = copy.deepcopy(headers)
+        parameters_clone = copy.deepcopy(headers)
+
+        # We strip out the password to avoid leaking it as file name
+        try:
+            del headers_clone['password']
+        except KeyError:
+            pass
+
+        # We strip out the current time to improve hit rates
+        try:
+            del parameters_clone['time']
+        except KeyError:
+            pass
+
+        sanitize = re.compile(r'[^a-zA-Z0-9]+')
+        cache_file = os.path.join(
+            cache_dir,
+            re.sub(sanitize, '-', method),
+            re.sub(sanitize, '-', url),
+            re.sub(sanitize, '-', str(headers_clone)),
+            re.sub(sanitize, '-', str(parameters_clone)),
+            )
+        cache_file_dir = os.path.dirname(cache_file)
+
+        content = None
+        if os.path.isfile(cache_file):
+            with open(cache_file, 'rb') as f:
+                content = f.read()
+            logger.debug(f'Using cached content from {cache_file}\n'
+                         f'{content.decode()}')
+        else:
+            logger.debug(f'Cache miss for {cache_file}')
+            content = self._raw_request(method, url, headers, parameters)
+
+            os.makedirs(cache_file_dir, exist_ok=True)
+            with open(cache_file, 'wb') as f:
+                f.write(content)
+
+        return content
+
     def _request(self, method, path, headers={}, parameters={},
                  authenticated=True):
         if authenticated and not self._login_response:
@@ -43,14 +109,13 @@ class Api(object):
 
         headers = self._compute_headers(custom_headers=headers)
 
-        response_raw = method(url, headers=headers, params=parameters)
+        if self._config.getboolean('development', 'development-mode'):
+            response_raw = self._cache_filled_raw_request(
+                method, url, headers, parameters)
+        else:
+            response_raw = self._raw_request(method, url, headers, parameters)
 
-        logger.debug(f'api request to url: {url}\nheaders: {headers}\n'
-                     f'parameters: {parameters}\n'
-                     f'response status code: {response_raw.status_code}\n'
-                     f'response:\n{response_raw.content.decode()}')
-
-        response = response_raw.json()
+        response = json.loads(response_raw)
 
         if response['statuscode'] != 200:
             raise RuntimeError(
@@ -69,12 +134,12 @@ class Api(object):
 
     def _get(self, path, headers={}, parameters={}, authenticated=True):
         return self._request(
-            requests.get, path, headers=headers, parameters=parameters,
+            'GET', path, headers=headers, parameters=parameters,
             authenticated=authenticated)
 
     def _post(self, path, headers={}, parameters={}, authenticated=True):
         return self._request(
-            requests.post, path, headers=headers, parameters=parameters,
+            'POST', path, headers=headers, parameters=parameters,
             authenticated=authenticated)
 
     def authenticate(self):
