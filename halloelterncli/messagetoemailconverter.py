@@ -78,11 +78,17 @@ class MessageToEmailConverter(object):
         email['Message-ID'] = self.get_message_id(message, confirmed=confirmed)
         email['User-Agent'] = self._config.get('api', 'user-agent')
 
+        replied_to_message = None
         if confirmed:
-            unconfirmed_message_id = self.get_message_id(
-                message, confirmed=False)
-            email['In-Reply-To'] = unconfirmed_message_id
-            email['References'] = unconfirmed_message_id
+            replied_to_message = message
+        elif parent:
+            replied_to_message = parent
+
+        if replied_to_message:
+            replied_to_message_id = self.get_message_id(
+                replied_to_message, confirmed=False)
+            email['In-Reply-To'] = replied_to_message_id
+            email['References'] = replied_to_message_id
 
         email['X-HalloElternApp-Sender-Id'] = message['sender']['itemid']
         email['X-HalloElternApp-Confirmation-Needed'] = \
