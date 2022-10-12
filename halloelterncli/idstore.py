@@ -18,8 +18,8 @@ class IdStore(object):
         with open(self._file, "w") as f:
             f.write(json.dumps(self._ids))
 
-    def has_been_seen(self, id):
+    def __contains__(self, id):
         return id in self._ids
 
-    def add(self, id, value=True):
+    def __setitem__(self, id, value=True):
         self._ids[id] = value

@@ -41,17 +41,23 @@ class HalloElternApp4Email(object):
             self._config, self._api.get_authenticated_user())
         self._process_all = args.process_all
 
-    def _needs_delivery(self, message):
+    def _get_store_id_for_message(self, message):
         confirmed_status = 'confirmed' if 'confirmed_by' in message \
             else 'unconfirmed'
-        id = f"{message['itemid']}-{confirmed_status}"
-
-        return self._process_all or not self._seen_ids_store.has_been_seen(id)
+        return f"{message['itemid']}-{confirmed_status}"
 
     def deliver(self, message, mda, extra_data, parent=None):
-        if self._needs_delivery(message):
+        store_id = self._get_store_id_for_message(message)
+        if self._process_all or store_id not in self._seen_ids_store:
             email = self._converter.convert(message, extra_data, parent)
             mda.deliver(email)
+
+            if parent:
+                message_title = f"Re: {parent['title']}"
+            else:
+                message_title = message['title']
+            store_tag = f"{message['date']}/{message_title}"
+            self._seen_ids_store[store_id] = store_tag
 
     def run(self, mda):
         for pinboard in self._api.list_pinboards():
@@ -76,7 +82,7 @@ class HalloElternApp4Email(object):
                         self.deliver(answer, mda, extra_data,
                                      parent=message)
 
-            self._seen_ids_store.persist()
+        self._seen_ids_store.persist()
 
 
 if __name__ == '__main__':
