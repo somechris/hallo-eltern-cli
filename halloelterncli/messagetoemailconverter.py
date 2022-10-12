@@ -84,12 +84,12 @@ class MessageToEmailConverter(object):
             email['In-Reply-To'] = unconfirmed_message_id
             email['References'] = unconfirmed_message_id
 
-            email['X-HalloElternApp-Sender-Id'] = message['sender']['itemid']
-            email['X-HalloElternApp-Confirmation-Needed'] = \
-                str(message['confirmation'])
-            email['X-HalloElternApp-Confirmed'] = \
-                'True' if confirmed else 'False'
-            email['X-HalloElternApp-Item-Id'] = message['itemid']
+        email['X-HalloElternApp-Sender-Id'] = message['sender']['itemid']
+        email['X-HalloElternApp-Confirmation-Needed'] = \
+            str(message['confirmation'])
+        email['X-HalloElternApp-Confirmed'] = 'True' if confirmed else 'False'
+        email['X-HalloElternApp-Item-Id'] = message['itemid']
+
         if 'child_name' in extra_data:
             email['X-HalloElternApp-Child-Name'] = extra_data['child_name']
         if 'class_name' in extra_data:
