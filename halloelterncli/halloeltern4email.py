@@ -39,17 +39,18 @@ class HalloElternApp4Email(object):
         self._seen_ids_store = idstore.IdStore(seen_ids_file)
         self._converter = messagetoemailconverter.MessageToEmailConverter(
             self._config, self._api.get_authenticated_user())
+        self._process_all = args.process_all
 
-    def deliver(self, message, mda, extra_data, process_all, parent=None):
+    def deliver(self, message, mda, extra_data, parent=None):
         confirmed_status = 'confirmed' if 'confirmed_by' in message \
             else 'unconfirmed'
         id = f"{message['itemid']}-{confirmed_status}"
 
-        if process_all or not self._seen_ids_store.has_been_seen(id):
+        if self._process_all or not self._seen_ids_store.has_been_seen(id):
             email = self._converter.convert(message, extra_data, parent)
             mda.deliver(email)
 
-    def run(self, mda, process_all=False):
+    def run(self, mda):
         for pinboard in self._api.list_pinboards():
             pinboard_id = pinboard['itemid']
             child_code = pinboard['code']
@@ -66,10 +67,10 @@ class HalloElternApp4Email(object):
                 id = abstract['itemid']
                 message = self._api.get_message(id, child_code)
 
-                self.deliver(message, mda, extra_data, process_all)
+                self.deliver(message, mda, extra_data)
                 for answer in message['answers']:
                     if answer['message']:
-                        self.deliver(answer, mda, extra_data, process_all,
+                        self.deliver(answer, mda, extra_data,
                                      parent=message)
 
             self._seen_ids_store.persist()
@@ -86,4 +87,4 @@ if __name__ == '__main__':
         raise RuntimeError(f"Unknown mode '{args.mode}'")
 
     hea4e = HalloElternApp4Email(config)
-    hea4e.run(mda, process_all=args.process_all)
+    hea4e.run(mda)
