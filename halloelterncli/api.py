@@ -151,6 +151,7 @@ class Api(object):
 
         self._login_response = self._post(
             '/account/login', headers=headers, authenticated=False)
+        return self._login_response
 
     def get_authenticated_user(self):
         if not self._login_response:
