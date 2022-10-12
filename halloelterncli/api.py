@@ -62,7 +62,7 @@ class Api(object):
     def _cache_filled_raw_request(self, method, url, headers, parameters):
         cache_dir = self._config.get('development', 'cache-dir')
         headers_clone = copy.deepcopy(headers)
-        parameters_clone = copy.deepcopy(headers)
+        parameters_clone = copy.deepcopy(parameters)
 
         # We strip out the password to avoid leaking it as file name
         try:
