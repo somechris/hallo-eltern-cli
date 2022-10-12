@@ -8,3 +8,4 @@ from .listcommand import ListCommand
 from .showcommand import ShowCommand
 from .testcommand import TestCommand
 from .closecommand import CloseCommand
+from .opencommand import OpenCommand

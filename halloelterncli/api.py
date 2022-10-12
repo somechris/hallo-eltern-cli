@@ -198,6 +198,14 @@ class Api(object):
 
         return self._put(f'/messages/{id}', parameters=parameters)
 
+    def open_message(self, id, child_code):
+        parameters = {
+            'open': 'true',
+            'code': child_code,
+            }
+
+        return self._put(f'/messages/{id}', parameters=parameters)
+
     def __str__(self):
         authenticated = bool(self._login_response)
         suffix = ''

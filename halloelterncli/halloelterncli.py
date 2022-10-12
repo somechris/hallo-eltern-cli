@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 COMMAND_CLASSES = [
     commands.ListCommand,
     commands.ShowCommand,
+    commands.OpenCommand,
     commands.CloseCommand,
     commands.TestCommand,
     ]
