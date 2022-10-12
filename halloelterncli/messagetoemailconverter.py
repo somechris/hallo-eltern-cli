@@ -97,6 +97,8 @@ class MessageToEmailConverter(object):
         if 'school_name' in extra_data:
             email['X-HalloElternApp-School-Name'] = extra_data['school_name']
 
-        email.set_content(message['message'])
+        content_json_string = message['message'].replace('\n', '\\n')
+        message_content = json.loads('"' + content_json_string + '"')
+        email.set_content(message_content)
 
         return email
