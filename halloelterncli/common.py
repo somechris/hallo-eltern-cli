@@ -52,6 +52,9 @@ def get_argument_parser(description):
     parser.add_argument('--config',
                         default=os.path.join(CONFIG_DIR, 'config'),
                         help='path to config file')
+    parser.add_argument('--development-mode',
+                        action='store_true',
+                        help='Use development mode (caches api calls)')
     parser.add_argument('--verbose', '-v',
                         default=0,
                         action='count',
@@ -60,11 +63,12 @@ def get_argument_parser(description):
 
 
 def handle_parsed_default_args(args):
-    global CONFIG_FILE
-    CONFIG_FILE = args.config
+    config = get_config(args.config)
+    if args.development_mode:
+        config.set('development', 'development-mode', 'True')
 
     if args.verbose > 0:
         logging.getLogger().setLevel(logging.DEBUG)
         logger.debug('Running in debug mode')
 
-    return args
+    return (args, config)

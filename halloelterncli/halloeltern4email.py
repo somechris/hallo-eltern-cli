@@ -62,8 +62,7 @@ class HalloElternApp4Email(object):
 
 
 if __name__ == '__main__':
-    args = parse_arguments()
-    config = common.get_config()
+    (args, config) = parse_arguments()
 
     if args.mode == 'procmail':
         mda = procmailmda.ProcmailMDA()

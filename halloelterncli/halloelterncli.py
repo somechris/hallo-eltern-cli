@@ -29,8 +29,7 @@ def parse_arguments():
 
 
 if __name__ == '__main__':
-    args = parse_arguments()
-    config = common.get_config()
+    (args, config) = parse_arguments()
 
     _class = args.command if 'command' in args else DEFAULT_COMMAND_CLASS
     command = _class(args, config)
