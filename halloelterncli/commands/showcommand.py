@@ -33,6 +33,7 @@ class ShowCommand(ApiCommand):
         message = self._api.get_message(id, child_code)
         self.print_message(message)
         for answer in message['answers']:
-            print()
-            self.print_separator()
-            self.print_message(answer, message)
+            if answer['message']:
+                print()
+                self.print_separator()
+                self.print_message(answer, message)
