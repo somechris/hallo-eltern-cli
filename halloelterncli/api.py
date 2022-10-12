@@ -107,6 +107,14 @@ class Api(object):
 
         return self._get('/messages', parameters=parameters)
 
+    def get_message(self, id, child_code):
+        parameters = {
+            'code': child_code,
+            'time': self.get_timestamp(),
+            }
+
+        return self._get(f'/messages/{id}', parameters=parameters)
+
     def __str__(self):
         authenticated = bool(self._login_response)
         suffix = ''

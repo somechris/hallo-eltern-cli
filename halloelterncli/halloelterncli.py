@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 COMMAND_CLASSES = [
     commands.ListCommand,
+    commands.ShowCommand,
     ]
 DEFAULT_COMMAND_CLASS = commands.ListCommand
 
