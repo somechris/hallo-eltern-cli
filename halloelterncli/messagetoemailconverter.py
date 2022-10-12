@@ -1,3 +1,4 @@
+import json
 import socket
 
 from datetime import datetime, timezone
@@ -38,13 +39,18 @@ class MessageToEmailConverter(object):
         if message['received']:
             receivers = [self._authenticated_user]
         else:
-            receivers = message['selected_receivers']
+            if 'selected_receivers' in message:
+                receivers = message['selected_receivers']
+            else:
+                receivers = [self._authenticated_user]
 
         return ', '.join([self._format_person(receiver)
                           for receiver in receivers])
 
-    def _build_subject_header(self, message, confirmed):
-        ret = message['title']
+    def _build_subject_header(self, message, confirmed, parent):
+        root_message = message if parent is None else parent
+        ret = 'Re: ' if root_message != message else ''
+        ret += root_message['title']
         if confirmed:
             prefix = self._config.get('email', 'confirmed-subject-prefix')
             prefix = prefix.replace('{{SPACE}}', ' ')
@@ -58,14 +64,15 @@ class MessageToEmailConverter(object):
                 f"{socket.getfqdn()} for <{address}>; "
                 f"{now}")
 
-    def convert(self, message, extra_data):
+    def convert(self, message, extra_data={}, parent=None):
         confirmed = 'confirmed_by' in message
 
         email = EmailMessage()
 
         email['From'] = self._format_person(message['sender'])
         email['To'] = self._build_to_header(message)
-        email['Subject'] = self._build_subject_header(message, confirmed)
+        email['Subject'] = self._build_subject_header(
+            message, confirmed, parent)
         email['Date'] = datetime.fromisoformat(message['date'][0:22] + ':00')
         email['Received'] = self._build_received_header()
         email['Message-ID'] = self.get_message_id(message, confirmed=confirmed)

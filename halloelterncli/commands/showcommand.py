@@ -31,8 +31,8 @@ class ShowCommand(ApiCommand):
     def print_header(self, email, header):
         print(f'{header}: {email[header]}')
 
-    def print_message(self, message):
-        email = self._message_converter.convert(message, extra_data={})
+    def print_message(self, message, parent=None):
+        email = self._message_converter.convert(message, parent=parent)
         self.print_header(email, 'From')
         self.print_header(email, 'To')
         self.print_header(email, 'Date')
@@ -47,3 +47,7 @@ class ShowCommand(ApiCommand):
             raise RuntimeError(f'Failed to find child code for message {id}')
         message = self._api.get_message(id, child_code)
         self.print_message(message)
+        for answer in message['answers']:
+            print()
+            self.print_separator()
+            self.print_message(answer, message)
