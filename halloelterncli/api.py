@@ -47,6 +47,8 @@ class Api(object):
             requests_method = requests.get
         elif method == 'POST':
             requests_method = requests.post
+        elif method == 'PUT':
+            requests_method = requests.put
         else:
             raise RuntimeError(f"Unknown method '{method}'")
 
@@ -123,7 +125,9 @@ class Api(object):
 
         ret = None
         response_type = response['response_type']
-        if response_type == 2:
+        if response_type == 1:
+            ret = None
+        elif response_type == 2:
             ret = response['listresponse']
         elif response_type == 3:
             ret = response['detailresponse']
@@ -140,6 +144,11 @@ class Api(object):
     def _post(self, path, headers={}, parameters={}, authenticated=True):
         return self._request(
             'POST', path, headers=headers, parameters=parameters,
+            authenticated=authenticated)
+
+    def _put(self, path, headers={}, parameters={}, authenticated=True):
+        return self._request(
+            'PUT', path, headers=headers, parameters=parameters,
             authenticated=authenticated)
 
     def authenticate(self):
@@ -180,6 +189,14 @@ class Api(object):
             }
 
         return self._get(f'/messages/{id}', parameters=parameters)
+
+    def close_message(self, id, child_code):
+        parameters = {
+            'open': 'false',
+            'code': child_code,
+            }
+
+        return self._put(f'/messages/{id}', parameters=parameters)
 
     def __str__(self):
         authenticated = bool(self._login_response)
