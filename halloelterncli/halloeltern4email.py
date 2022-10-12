@@ -41,12 +41,15 @@ class HalloElternApp4Email(object):
             self._config, self._api.get_authenticated_user())
         self._process_all = args.process_all
 
-    def deliver(self, message, mda, extra_data, parent=None):
+    def _needs_delivery(self, message):
         confirmed_status = 'confirmed' if 'confirmed_by' in message \
             else 'unconfirmed'
         id = f"{message['itemid']}-{confirmed_status}"
 
-        if self._process_all or not self._seen_ids_store.has_been_seen(id):
+        return self._process_all or not self._seen_ids_store.has_been_seen(id)
+
+    def deliver(self, message, mda, extra_data, parent=None):
+        if self._needs_delivery(message):
             email = self._converter.convert(message, extra_data, parent)
             mda.deliver(email)
 
