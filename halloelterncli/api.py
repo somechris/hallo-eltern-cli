@@ -171,16 +171,21 @@ class Api(object):
         return self._get('/pinboard')
 
     def list_messages(self, pinboard, child_code):
-        parameters = {
+        base_parameters = {
             'search': '',
-            'closed': 'false',
             'pagingresults': '10',
             'pinboard': pinboard,
             'childcode': child_code,
             'time': self.get_timestamp(),
             }
 
-        return self._get('/messages', parameters=parameters)
+        messages = []
+        for closed in ['true', 'false']:
+            parameters = copy.deepcopy(base_parameters)
+            parameters['closed'] = closed
+            messages += self._get('/messages', parameters=parameters)
+
+        return messages
 
     def get_message(self, id, child_code):
         parameters = {
