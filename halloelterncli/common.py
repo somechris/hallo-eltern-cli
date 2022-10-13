@@ -7,7 +7,6 @@ CONFIG_DIR = os.path.join(
     os.path.expanduser('~'), '.config', 'hallo-eltern-cli')
 CACHE_DIR = os.path.join(
     os.path.expanduser('~'), '.cache', 'hallo-eltern-cli')
-CONFIG_FILE = None
 DEFAULT_CONFIG = """
 [api]
 email=foo@example.org
@@ -35,9 +34,7 @@ logging.basicConfig(format=LOG_FORMAT, datefmt=LOG_DATE_FORMAT)
 logger = logging.getLogger(__name__)
 
 
-def get_config(config_file=None):
-    if config_file is None:
-        config_file = CONFIG_FILE
+def get_config(config_file):
     interpolation = configparser.ExtendedInterpolation()
     config = configparser.ConfigParser(interpolation=interpolation)
     config.read_string(DEFAULT_CONFIG)
