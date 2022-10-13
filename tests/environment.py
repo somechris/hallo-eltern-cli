@@ -1,5 +1,6 @@
 import unittest
 import collections.abc
+import json
 import os
 import shutil
 import subprocess
@@ -54,6 +55,28 @@ class BasicTestCase(unittest.TestCase):
             self.add_fixture(name, dir)
 
         return ctx
+
+    def flatten(self, x):
+        ret = []
+        if isinstance(x, list):
+            for element in x:
+                ret += self.flatten(element)
+        else:
+            ret = [x]
+        return ret
+
+    def get_file_contents(self, file_name, text=True):
+        flat_file_name = os.path.join(*self.flatten(file_name))
+        with open(flat_file_name, 'r' + ('t' if text else 'b')) as file:
+            contents = file.read()
+        return contents
+
+    def get_json_file_contents(self, file_name):
+        return json.loads(self.get_file_contents(file_name))
+
+    def assertFileJsonContents(self, file_name, expected):
+        actual = self.get_json_file_contents(file_name)
+        self.assertEqual(actual, expected)
 
 
 class CanaryTestCase(BasicTestCase):

@@ -15,6 +15,7 @@ class IdStore(object):
                 self._ids = json.load(f)
 
     def persist(self):
+        os.makedirs(os.path.dirname(self._file), exist_ok=True)
         with open(self._file, "w") as f:
             f.write(json.dumps(self._ids))
 
