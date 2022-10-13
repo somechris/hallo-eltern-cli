@@ -6,11 +6,12 @@ from email.message import EmailMessage
 
 
 class MessageToEmailConverter(object):
-    def __init__(self, config, authenticated_user):
+    def __init__(self, config, authenticated_user, api=None):
         self._config = config
         self._message_id_domain = self._config.get('email', 'default-address')\
             .rsplit('@', 1)[1]
         self._authenticated_user = authenticated_user
+        self._api = api
 
     def get_datetime(self):
         return datetime.now(timezone.utc)
@@ -64,7 +65,8 @@ class MessageToEmailConverter(object):
                 f"{socket.getfqdn()} for <{address}>; "
                 f"{now}")
 
-    def convert(self, message, extra_data={}, parent=None):
+    def convert(self, message, extra_data={}, parent=None,
+                embed_attachments=False):
         confirmed = 'confirmed_by' in message
 
         email = EmailMessage()
@@ -107,4 +109,16 @@ class MessageToEmailConverter(object):
         message_content = json.loads('"' + content_json_string + '"')
         email.set_content(message_content)
 
+        if 'link' in message:
+            filename = message.get('filename_client', 'attachment')
+            ending = ('.' + filename).rsplit('.', 1)[1].lower()
+            mime_type = 'application/octet-stream'
+            if ending == 'jpg' or ending == 'jpeg':
+                mime_type = 'image/jpeg'
+            elif ending == 'pdf':
+                mime_type = 'application/pdf'
+            (mime_maintype, _, mime_subtype) = mime_type.partition('/')
+            content = self._api.get_media_file(message['link'])
+            email.add_attachment(content, maintype=mime_maintype,
+                                 subtype=mime_subtype, filename=filename)
         return email

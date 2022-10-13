@@ -38,7 +38,7 @@ class HalloElternApp4Email(object):
         seen_ids_file = config.get('base', 'seen-ids-file')
         self._seen_ids_store = idstore.IdStore(seen_ids_file)
         self._converter = messagetoemailconverter.MessageToEmailConverter(
-            self._config, self._api.get_authenticated_user())
+            self._config, self._api.get_authenticated_user(), self._api)
         self._process_all = args.process_all
 
     def _get_store_id_for_message(self, message):
@@ -49,7 +49,8 @@ class HalloElternApp4Email(object):
     def deliver(self, message, mda, extra_data, parent=None):
         store_id = self._get_store_id_for_message(message)
         if self._process_all or store_id not in self._seen_ids_store:
-            email = self._converter.convert(message, extra_data, parent)
+            email = self._converter.convert(message, extra_data, parent,
+                                            embed_attachments=True)
             mda.deliver(email)
 
             if parent:

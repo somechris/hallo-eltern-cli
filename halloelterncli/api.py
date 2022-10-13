@@ -38,7 +38,7 @@ class Api(object):
     def get_timestamp(self):
         return int(datetime.now(timezone.utc).timestamp())
 
-    def _raw_request(self, method, url, headers, parameters):
+    def _raw_request(self, method, url, headers, parameters, binary):
         logger.debug(f'api request {method} to url: {url}\n'
                      f'headers: {headers}\n'
                      f'parameters: {parameters}')
@@ -53,13 +53,16 @@ class Api(object):
             raise RuntimeError(f"Unknown method '{method}'")
 
         response = requests_method(url, headers=headers, params=parameters)
+        content = response.content
 
         logger.debug(f'response status code: {response.status_code}\n'
-                     f'response:\n{response.content.decode()}')
+                     'response:\n'
+                     f"{'<<binary data>>' if binary else content.decode()}")
 
-        return response.content
+        return content
 
-    def _cache_filled_raw_request(self, method, url, headers, parameters):
+    def _cache_filled_raw_request(self, method, url, headers, parameters,
+                                  binary):
         cache_dir = self._config.get('development', 'cache-dir')
         headers_clone = copy.deepcopy(headers)
         parameters_clone = copy.deepcopy(parameters)
@@ -90,11 +93,13 @@ class Api(object):
         if os.path.isfile(cache_file):
             with open(cache_file, 'rb') as f:
                 content = f.read()
-            logger.debug(f'Using cached content from {cache_file}\n'
-                         f'{content.decode()}')
+            logger.debug(
+                f'Using cached content from {cache_file}\n'
+                f"{'<<binary data>>' if binary else content.decode()}")
         else:
             logger.debug(f'Cache miss for {cache_file}')
-            content = self._raw_request(method, url, headers, parameters)
+            content = self._raw_request(
+                method, url, headers, parameters, binary)
 
             os.makedirs(cache_file_dir, exist_ok=True)
             with open(cache_file, 'wb') as f:
@@ -103,53 +108,67 @@ class Api(object):
         return content
 
     def _request(self, method, path, headers={}, parameters={},
-                 authenticated=True):
+                 authenticated=True, binary=False):
         if authenticated and not self._login_response:
             self.authenticate()
 
-        url = self._get_config('base_url') + path
+        base_url = self._get_config('base_url')
+        if path.startswith('/'):
+            url = base_url + path
+        else:
+            if not path.startswith(base_url):
+                raise RuntimeError(
+                    f'Path {path} starts with neither / nor {base_url}')
+            url = path
 
         headers = self._compute_headers(custom_headers=headers)
 
         if self._config.getboolean('development', 'development-mode'):
             response_raw = self._cache_filled_raw_request(
-                method, url, headers, parameters)
+                method, url, headers, parameters, binary)
         else:
-            response_raw = self._raw_request(method, url, headers, parameters)
+            response_raw = self._raw_request(
+                method, url, headers, parameters, binary)
 
-        response = json.loads(response_raw)
+        if binary:
+            ret = response_raw
+        else:
+            response = json.loads(response_raw)
 
-        if response['statuscode'] != 200:
-            raise RuntimeError(
-                f"status code was {response['statuscode']} instead of 200")
+            if response['statuscode'] != 200:
+                raise RuntimeError(
+                    f"status code was {response['statuscode']} instead of 200")
 
-        ret = None
-        response_type = response['response_type']
-        if response_type == 1:
             ret = None
-        elif response_type == 2:
-            ret = response['listresponse']
-        elif response_type == 3:
-            ret = response['detailresponse']
-        else:
-            raise RuntimeError(f'Unknown response_type "{response_type}"')
+            response_type = response['response_type']
+            if response_type == 1:
+                ret = None
+            elif response_type == 2:
+                ret = response['listresponse']
+            elif response_type == 3:
+                ret = response['detailresponse']
+            else:
+                raise RuntimeError(f'Unknown response_type "{response_type}"')
 
         return ret
 
-    def _get(self, path, headers={}, parameters={}, authenticated=True):
+    def _get(self, path, headers={}, parameters={}, authenticated=True,
+             binary=False):
         return self._request(
             'GET', path, headers=headers, parameters=parameters,
-            authenticated=authenticated)
+            authenticated=authenticated, binary=binary)
 
-    def _post(self, path, headers={}, parameters={}, authenticated=True):
+    def _post(self, path, headers={}, parameters={}, authenticated=True,
+              binary=False):
         return self._request(
             'POST', path, headers=headers, parameters=parameters,
-            authenticated=authenticated)
+            authenticated=authenticated, binary=binary)
 
-    def _put(self, path, headers={}, parameters={}, authenticated=True):
+    def _put(self, path, headers={}, parameters={}, authenticated=True,
+             binary=False):
         return self._request(
             'PUT', path, headers=headers, parameters=parameters,
-            authenticated=authenticated)
+            authenticated=authenticated, binary=binary)
 
     def authenticate(self):
         self._login_response = {}
@@ -210,6 +229,9 @@ class Api(object):
             }
 
         return self._put(f'/messages/{id}', parameters=parameters)
+
+    def get_media_file(self, full_url):
+        return self._get(full_url, binary=True)
 
     def __str__(self):
         authenticated = bool(self._login_response)
