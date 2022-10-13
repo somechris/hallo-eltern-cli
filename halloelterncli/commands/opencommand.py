@@ -1,14 +1,8 @@
 from . import ApiCommand
 from .utils import register_command_class
-from halloelterncli import MessageToEmailConverter
 
 
 class OpenCommand(ApiCommand):
-    def __init__(self, args, config):
-        super(OpenCommand, self).__init__(args, config)
-        self._message_converter = MessageToEmailConverter(
-            self._config, self._api.get_authenticated_user())
-
     @classmethod
     def register_subparser(cls, subparsers):
         parser = register_command_class(
