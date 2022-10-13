@@ -48,7 +48,8 @@ def get_config(config_file=None):
 
 def get_argument_parser(description):
     parser = argparse.ArgumentParser(
-        description='Turn messages from Hallo-Eltern-App into email')
+        description='Turn messages from Hallo-Eltern-App into email',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--config',
                         default=os.path.join(CONFIG_DIR, 'config'),
                         help='path to config file')
