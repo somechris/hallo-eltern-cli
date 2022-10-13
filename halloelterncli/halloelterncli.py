@@ -12,6 +12,7 @@ COMMAND_CLASSES = [
     commands.ShowCommand,
     commands.OpenCommand,
     commands.CloseCommand,
+    commands.ConfigCommand,
     commands.TestCommand,
     ]
 DEFAULT_COMMAND_CLASS = commands.ListCommand

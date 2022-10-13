@@ -34,10 +34,11 @@ logging.basicConfig(format=LOG_FORMAT, datefmt=LOG_DATE_FORMAT)
 logger = logging.getLogger(__name__)
 
 
-def get_config(config_file):
+def get_config(config_file, load_defaults=True):
     interpolation = configparser.ExtendedInterpolation()
     config = configparser.ConfigParser(interpolation=interpolation)
-    config.read_string(DEFAULT_CONFIG)
+    if load_defaults:
+        config.read_string(DEFAULT_CONFIG)
     if os.path.isfile(config_file):
         config.read(config_file)
     return config
