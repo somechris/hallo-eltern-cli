@@ -2,18 +2,13 @@
 
 import logging
 
-import api
-import common
-import idstore
-import messagetoemailconverter
-import procmailmda
-import stdoutmda
+import halloelterncli
 
 logger = logging.getLogger(__name__)
 
 
 def parse_arguments():
-    parser = common.get_argument_parser(
+    parser = halloelterncli.get_argument_parser(
         description='Turn messages from Hallo-Eltern-App into email')
     parser.add_argument('--mode',
                         default='stdout',
@@ -28,16 +23,16 @@ def parse_arguments():
 
     args = parser.parse_args()
 
-    return common.handle_parsed_default_args(args)
+    return halloelterncli.handle_parsed_default_args(args)
 
 
 class HalloElternApp4Email(object):
     def __init__(self, config):
         self._config = config
-        self._api = api.Api(self._config)
+        self._api = halloelterncli.Api(self._config)
         seen_ids_file = config.get('base', 'seen-ids-file')
-        self._seen_ids_store = idstore.IdStore(seen_ids_file)
-        self._converter = messagetoemailconverter.MessageToEmailConverter(
+        self._seen_ids_store = halloelterncli.IdStore(seen_ids_file)
+        self._converter = halloelterncli.MessageToEmailConverter(
             self._config, self._api.get_authenticated_user(), self._api)
         self._process_all = args.process_all
 
@@ -90,9 +85,9 @@ if __name__ == '__main__':
     (args, config) = parse_arguments()
 
     if args.mode == 'procmail':
-        mda = procmailmda.ProcmailMDA()
+        mda = halloelterncli.ProcmailMDA()
     elif args.mode == 'stdout':
-        mda = stdoutmda.StdoutMDA()
+        mda = halloelterncli.StdoutMDA()
     else:
         raise RuntimeError(f"Unknown mode '{args.mode}'")
 

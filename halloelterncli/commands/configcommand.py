@@ -1,7 +1,7 @@
 import configparser
 import os
 
-import common
+from halloelterncli import get_config
 
 from . import BaseCommand
 from .utils import register_command_class
@@ -36,7 +36,7 @@ class ConfigCommand(BaseCommand):
 
     def run(self):
         config_file = self._args.config
-        config = common.get_config(config_file, load_defaults=False)
+        config = get_config(config_file, load_defaults=False)
 
         self._store_if_set(self._args.password, config, 'api', 'password')
         self._store_if_set(self._args.email, config, 'api', 'email')

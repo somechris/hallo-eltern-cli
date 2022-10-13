@@ -1,6 +1,6 @@
-import mda
+from . import MDA
 
 
-class StdoutMDA(mda.MDA):
+class StdoutMDA(MDA):
     def deliver(self, message):
         print(message)

@@ -1,6 +1,6 @@
 from . import ApiCommand
 from .utils import register_command_class
-from messagetoemailconverter import MessageToEmailConverter
+from halloelterncli import MessageToEmailConverter
 
 
 class CloseCommand(ApiCommand):

@@ -1,11 +1,12 @@
+import halloelterncli
+
 from . import BaseCommand
-import api
 
 
 class ApiCommand(BaseCommand):
     def __init__(self, args, config):
         super(ApiCommand, self).__init__(args, config)
-        self._api = api.Api(self._config)
+        self._api = halloelterncli.Api(self._config)
 
     def get_child_code_for_message_id(self, id):
         ret = None
