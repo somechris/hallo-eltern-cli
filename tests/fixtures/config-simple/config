@@ -1,0 +1,7 @@
+[api]
+email = bar
+password = SECRET
+quux = quuux
+
+[foo]
+bar=quux
