@@ -16,8 +16,8 @@ user-agent=hallo-eltern-cli/0.0.1
 
 [email]
 default-address=do-not-reply@example.org
-confirmation-needed-subject-prefix=[confirmation needed]{{SPACE}}
-confirmed-subject-prefix=[confirmed]{{SPACE}}
+confirmation-needed-subject-prefix=[Confirmation needed]{{SPACE}}
+confirmed-subject-prefix=[Confirmed]{{SPACE}}
 
 [base]
 seen-ids-file={{CONFIG_DIR}}/seen-ids.json
