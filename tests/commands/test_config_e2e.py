@@ -196,3 +196,88 @@ class CliConfigCommandTestCase(CliCanaryTestCase):
                         'foo': 'quuux',
                         }},
                 )
+
+    def test_config_dump_unblanked_no_params(self):
+        fixture = 'config-passwords'
+        with self.prepared_environment(fixture) as dir:
+            config_file = os.path.join(dir, fixture, 'config')
+            result = self.run_config_command(
+                ['--dump-unblanked'],
+                config_file=config_file)
+
+            self.assertEqual(result['stderr'], '')
+            self.assertEqual(result['stdout'], '\n'.join([
+                    '[api]',
+                    'email = bar',
+                    'password = i-will-not-tell',
+                    'secret = give-up',
+                    '',
+                    '[foo]',
+                    'bar = quux',
+                    'passcode = no-chance',
+                    '',
+                    '[bar]',
+                    'foo = quuux',
+                    '',
+                    '',
+                    ]))
+
+            self.assertConfigFileIs(
+                config_file,
+                {'api': {
+                        'email': 'bar',
+                        'password': 'i-will-not-tell',
+                        'secret': 'give-up',
+                        },
+                 'foo': {
+                        'bar': 'quux',
+                        'passcode': 'no-chance',
+                        },
+                 'bar': {
+                        'foo': 'quuux',
+                        }},
+                )
+
+    def test_config_dump_unblanked_while_setting_all(self):
+        fixture = 'config-passwords'
+        with self.prepared_environment(fixture) as dir:
+            config_file = os.path.join(dir, fixture, 'config')
+            result = self.run_config_command(
+                ['--email', 'foo@example.org',
+                 '--password', 'secret',
+                 '--dump-unblanked',
+                 ],
+                config_file=config_file)
+
+            self.assertEqual(result['stderr'], '')
+            self.assertEqual(result['stdout'], '\n'.join([
+                    '[api]',
+                    'email = foo@example.org',
+                    'password = secret',
+                    'secret = give-up',
+                    '',
+                    '[foo]',
+                    'bar = quux',
+                    'passcode = no-chance',
+                    '',
+                    '[bar]',
+                    'foo = quuux',
+                    '',
+                    '',
+                    ]))
+
+            self.assertConfigFileIs(
+                config_file,
+                {'api': {
+                        'email': 'foo@example.org',
+                        'password': 'secret',
+                        'secret': 'give-up',
+                        },
+                 'foo': {
+                        'bar': 'quux',
+                        'passcode': 'no-chance',
+                        },
+                 'bar': {
+                        'foo': 'quuux',
+                        }},
+                )

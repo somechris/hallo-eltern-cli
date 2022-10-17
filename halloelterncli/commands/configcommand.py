@@ -18,6 +18,10 @@ class ConfigCommand(BaseCommand):
             '--dump', action='store_true',
             help='Prints the config to stdout. Passwords will get blanked.')
         parser.add_argument(
+            '--dump-unblanked', action='store_true',
+            help='Prints the config to stdout. '
+            'BE CAREFUL! THIS ALSO PRINTS PASSWORDS!')
+        parser.add_argument(
             '--email', help='Sets the email to use for authentication')
         parser.add_argument(
             '--password', help='Sets the password to use for authentication. '
@@ -39,15 +43,17 @@ class ConfigCommand(BaseCommand):
                 pass
             config.set(section, option, value)
 
-    def dump(self, config):
+    def dump(self, config, blank=True):
         config = copy.deepcopy(config)
 
-        for section in config.values():
-            for option in section:
-                lower_option = option.lower()
-                if 'pass' in lower_option or 'secr' in lower_option:
-                    # The option looks like it's a password, so we blank it.
-                    section[option] = '<<BLANKED>>'
+        if blank:
+            for section in config.values():
+                for option in section:
+                    lower_option = option.lower()
+                    if 'pass' in lower_option or 'secr' in lower_option:
+                        # The option looks like it's a password, so we blank
+                        # it.
+                        section[option] = '<<BLANKED>>'
 
         config.write(sys.stdout)
 
@@ -59,7 +65,10 @@ class ConfigCommand(BaseCommand):
         self._store_if_set(self._args.email, config, 'api', 'email')
 
         if self._args.dump:
-            self.dump(config)
+            self.dump(config, blank=True)
+
+        if self._args.dump_unblanked:
+            self.dump(config, blank=False)
 
         config_file_dir = os.path.dirname(config_file)
         os.makedirs(config_file_dir, exist_ok=True)
