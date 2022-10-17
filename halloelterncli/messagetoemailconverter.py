@@ -48,12 +48,18 @@ class MessageToEmailConverter(object):
         return ', '.join([self._format_person(receiver)
                           for receiver in receivers])
 
-    def _build_subject_header(self, message, confirmed, parent):
+    def _build_subject_header(self, message, confirmation_needed, confirmed,
+                              parent):
         root_message = message if parent is None else parent
         ret = 'Re: ' if root_message != message else ''
         ret += root_message['title']
         if confirmed:
             prefix = self._config.get('email', 'confirmed-subject-prefix')
+            prefix = prefix.replace('{{SPACE}}', ' ')
+            ret = prefix + ret
+        elif confirmation_needed:
+            prefix = self._config.get(
+                'email', 'confirmation-needed-subject-prefix')
             prefix = prefix.replace('{{SPACE}}', ' ')
             ret = prefix + ret
         return ret
@@ -67,14 +73,14 @@ class MessageToEmailConverter(object):
 
     def convert(self, message, extra_data={}, parent=None,
                 embed_attachments=False):
+        confirmation_needed = message['confirmation']
         confirmed = 'confirmed_by' in message
-
         email = EmailMessage()
 
         email['From'] = self._format_person(message['sender'])
         email['To'] = self._build_to_header(message)
         email['Subject'] = self._build_subject_header(
-            message, confirmed, parent)
+            message, confirmation_needed, confirmed, parent)
         email['Date'] = datetime.fromisoformat(message['date'][0:22] + ':00')
         email['Received'] = self._build_received_header()
         email['Message-ID'] = self.get_message_id(message, confirmed=confirmed)
@@ -94,7 +100,7 @@ class MessageToEmailConverter(object):
 
         email['X-HalloElternApp-Sender-Id'] = message['sender']['itemid']
         email['X-HalloElternApp-Confirmation-Needed'] = \
-            str(message['confirmation'])
+            str(confirmation_needed)
         email['X-HalloElternApp-Confirmed'] = 'True' if confirmed else 'False'
         email['X-HalloElternApp-Item-Id'] = message['itemid']
 

@@ -16,6 +16,7 @@ user-agent=hallo-eltern-cli/0.0.1
 
 [email]
 default-address=do-not-reply@example.org
+confirmation-needed-subject-prefix=[confirmation needed]{{SPACE}}
 confirmed-subject-prefix=[confirmed]{{SPACE}}
 
 [base]
