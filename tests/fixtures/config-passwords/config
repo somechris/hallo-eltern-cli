@@ -1,0 +1,11 @@
+[api]
+email = bar
+password = i-will-not-tell
+secret = give-up
+
+[foo]
+bar=quux
+passcode = no-chance
+
+[bar]
+foo = quuux

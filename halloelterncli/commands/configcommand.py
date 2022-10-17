@@ -1,5 +1,7 @@
 import configparser
+import copy
 import os
+import sys
 
 from halloelterncli import get_config
 
@@ -12,6 +14,9 @@ class ConfigCommand(BaseCommand):
     def register_subparser(cls, subparsers):
         parser = register_command_class(
             cls, subparsers, 'updates configuration')
+        parser.add_argument(
+            '--dump', action='store_true',
+            help='Prints the config to stdout. Passwords will get blanked.')
         parser.add_argument(
             '--email', help='Sets the email to use for authentication')
         parser.add_argument(
@@ -34,12 +39,27 @@ class ConfigCommand(BaseCommand):
                 pass
             config.set(section, option, value)
 
+    def dump(self, config):
+        config = copy.deepcopy(config)
+
+        for section in config.values():
+            for option in section:
+                lower_option = option.lower()
+                if 'pass' in lower_option or 'secr' in lower_option:
+                    # The option looks like it's a password, so we blank it.
+                    section[option] = '<<BLANKED>>'
+
+        config.write(sys.stdout)
+
     def run(self):
         config_file = self._args.config
         config = get_config(config_file, load_defaults=False)
 
         self._store_if_set(self._args.password, config, 'api', 'password')
         self._store_if_set(self._args.email, config, 'api', 'email')
+
+        if self._args.dump:
+            self.dump(config)
 
         config_file_dir = os.path.dirname(config_file)
         os.makedirs(config_file_dir, exist_ok=True)
