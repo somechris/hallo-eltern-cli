@@ -6,7 +6,7 @@ class OpenCommand(ApiCommand):
     @classmethod
     def register_subparser(cls, subparsers):
         parser = register_command_class(
-            cls, subparsers, 'opens a message')
+            cls, subparsers, 'marks a message as opens')
 
         parser.add_argument('id', help='The id of the message to open')
 
