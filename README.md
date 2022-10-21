@@ -21,7 +21,7 @@ full messages including attachments directly to your local inbox.
 
 ## Installation
 
-On a Linux-like system with a recent Python (`>=3.7`) run:
+On a Linux-like system with a recent Python (`>=3.6`) run:
 
 ```
 # Install Python's "requests" library:
