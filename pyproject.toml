@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "hallo-eltern-cli"
+version = "0.1.0"
+description = "A command-line/Python/email interface for Education Group GmbH's 'Hallo!Eltern' App for Upper-Austrian schools."
+authors = ["Christian Aistleitner <christian@quelltextlich.at>"]
+license = "Apache-2.0"
+readme = "README.md"
+homepage = "https://github.com/somechris/hallo-eltern-cli"
+repository = "https://github.com/somechris/hallo-eltern-cli"
+keywords = ["hallo", "hallo eltern", "api", "email"]
+classifiers = [
+  "Environment :: Console",
+  "Topic :: Communications :: Email"
+  ]
+
+[tool.poetry.dependencies]
+python = ">=3.6"
+requests = "^2.17.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[tool.poetry.scripts]
+hallo-eltern-cli = 'hallo_eltern_cli.cli:run'
+hallo-eltern4email = 'hallo_eltern_cli.cli4email:run'
+
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/somechris/hallo-eltern-cli/issues"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
