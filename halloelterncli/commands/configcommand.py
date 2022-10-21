@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import configparser
-import copy
 import os
 import sys
 
@@ -48,7 +47,11 @@ class ConfigCommand(BaseCommand):
             config.set(section, option, value)
 
     def dump(self, config, blank=True):
-        config = copy.deepcopy(config)
+        # On Python <3.7, copy.deepcopy fails for configparser objects.
+        # So we deep copy through reparsing.
+        clone = configparser.ConfigParser()
+        clone.read_dict(config)
+        config = clone
 
         if blank:
             for section in config.values():
