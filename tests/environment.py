@@ -105,7 +105,7 @@ class CanaryTestCase(BasicTestCase):
 
 class CliCanaryTestCase(CanaryTestCase):
     def run_cli_command(self, cli_arguments, expected_returncode=0):
-        command = [os.path.join('.', 'halloelterncli.py')] + cli_arguments
+        command = ['python3', '-m', 'hallo_eltern_cli.cli'] + cli_arguments
 
         return self.run_command(command,
                                 expected_returncode=expected_returncode)
