@@ -1,3 +1,7 @@
+# This file is part of hallo-eltern-cli and licensed under the
+# Apache License Version 2.0 (See LICENSE.txt)
+# SPDX-License-Identifier: Apache-2.0
+
 def guess_command_name(cls):
     """Guess the inteded command name from the class name"""
     command_name = cls.__name__.lower()
