@@ -21,26 +21,27 @@ full messages including attachments directly to your local inbox.
 
 ## Installation
 
-On a Linux-like system with a recent Python (`>=3.6`) run:
+You need Python `>=3.6`
+
+1. Install the package:
+
+   ```
+   pip3 install hallo-eltern-cli
+   ```
+
+1. Set the credentials from your "Hallo!Eltern" application:
+
+    ```
+    hallo-eltern-cli config --email YOUR-EMAIL@EXAMPLE.ORG --password YOUR-PASSWORD
+    ```
+
+1. Done \o/
+
+`hallo-eltern-cli` is now ready for use. For example to list messages,
+use the `list` command:
 
 ```
-# Install Python's "requests" library:
-sudo apt-get install python3-requests
-
-# Clone this repo:
-git clone https://github.com/somechris/hallo-eltern-cli
-
-# Switch to the cloned repo:
-cd hallo-eltern-cli
-
-# Configure your credentials:
-./halloelterncli.py config --email YOUR-EMAIL@EXAMPLE.ORG --password YOUR-PASSWORD
-
-# Done. \o/
-
-# You can now use the hallo-eltern-cli
-# E.g.: List your messages:
-./halloelterncli.py list
+hallo-eltern-cli list
 [...]
 
 Flags |   Id    | Subject
