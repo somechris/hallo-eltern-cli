@@ -5,8 +5,8 @@
 "[Hallo!Eltern](https://hallo-eltern.klassenpinnwand.at/)" application
 for Upper-Austrian schools.
 
-`hallo-eltern-cli` is not affiliated with Education Group GmbH or the
-"Hallo!Eltern" Application in any way. "Hallo!Eltern" Application is a
+`hallo-eltern-cli` is not affiliated with Education Group GmbH or their
+"Hallo!Eltern" application in any way. The "Hallo!Eltern" application is a
 product of the Education Group GmbH.
 
 `hallo-eltern-cli` allows to list, messages, read them, download
