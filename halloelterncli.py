@@ -5,24 +5,24 @@
 
 import logging
 
-import halloelterncli
-from halloelterncli import commands
+import hallo_eltern_cli
+from hallo_eltern_cli import commands
 
 logger = logging.getLogger(__name__)
 
 COMMAND_CLASSES = [
-    halloelterncli.commands.ListCommand,
-    halloelterncli.commands.ShowCommand,
-    halloelterncli.commands.OpenCommand,
-    halloelterncli.commands.CloseCommand,
-    halloelterncli.commands.ConfigCommand,
-    halloelterncli.commands.TestCommand,
+    hallo_eltern_cli.commands.ListCommand,
+    hallo_eltern_cli.commands.ShowCommand,
+    hallo_eltern_cli.commands.OpenCommand,
+    hallo_eltern_cli.commands.CloseCommand,
+    hallo_eltern_cli.commands.ConfigCommand,
+    hallo_eltern_cli.commands.TestCommand,
     ]
 DEFAULT_COMMAND_CLASS = commands.ListCommand
 
 
 def parse_arguments():
-    parser = halloelterncli.get_argument_parser(
+    parser = hallo_eltern_cli.get_argument_parser(
         description='Simple CLI interface for Hallo-Eltern-App')
 
     subparsers = parser.add_subparsers(
@@ -32,7 +32,7 @@ def parse_arguments():
 
     args = parser.parse_args()
 
-    return halloelterncli.handle_parsed_default_args(args)
+    return hallo_eltern_cli.handle_parsed_default_args(args)
 
 
 if __name__ == '__main__':

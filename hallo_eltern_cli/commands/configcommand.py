@@ -6,7 +6,7 @@ import configparser
 import os
 import sys
 
-from halloelterncli import get_config
+from hallo_eltern_cli import get_config
 
 from . import BaseCommand
 from .utils import register_command_class

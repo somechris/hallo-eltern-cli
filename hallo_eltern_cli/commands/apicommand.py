@@ -2,7 +2,7 @@
 # Apache License Version 2.0 (See LICENSE.txt)
 # SPDX-License-Identifier: Apache-2.0
 
-import halloelterncli
+import hallo_eltern_cli
 
 from . import BaseCommand
 
@@ -10,7 +10,7 @@ from . import BaseCommand
 class ApiCommand(BaseCommand):
     def __init__(self, args, config):
         super(ApiCommand, self).__init__(args, config)
-        self._api = halloelterncli.Api(self._config)
+        self._api = hallo_eltern_cli.Api(self._config)
 
     def get_child_code_for_message_id(self, id):
         ret = None

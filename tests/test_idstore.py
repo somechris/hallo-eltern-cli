@@ -4,7 +4,7 @@
 
 import os
 
-from halloelterncli import IdStore
+from hallo_eltern_cli import IdStore
 
 from .environment import CliCanaryTestCase
 

@@ -4,7 +4,7 @@
 
 from . import ApiCommand
 from .utils import register_command_class
-from halloelterncli import MessageToEmailConverter
+from hallo_eltern_cli import MessageToEmailConverter
 
 
 class ShowCommand(ApiCommand):

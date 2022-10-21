@@ -51,7 +51,7 @@ class BasicTestCase(unittest.TestCase):
     def prepared_environment(self, name=None, cleanup=True):
         temp_dir_cls = tempfile.TemporaryDirectory if cleanup \
             else NotCleanedUpTemporaryDirectory
-        ctx = temp_dir_cls(prefix='halloelterncli-test-')
+        ctx = temp_dir_cls(prefix='hallo-eltern-cli-test-')
 
         dir = ctx.name
 
