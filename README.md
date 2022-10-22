@@ -63,6 +63,7 @@ The CLI offers the following commands:
 * `close` marks a message as closed
 * `config` updates and dumps the configuration
 * `test` tests the configured user againts the API
+* `mta` forwards messages as emails
 
 ## Email integration
 
@@ -73,5 +74,5 @@ e.g. `procmail`). To run it for example 12 minutes into every hour,
 simply add a crontab entry like:
 
 ```
-12 * * * * /path/to/hallo-eltern4email --mode=procmail
+12 * * * * /path/to/hallo-eltern4email mta --mda=procmail
 ```
