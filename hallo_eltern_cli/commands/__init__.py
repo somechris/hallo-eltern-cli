@@ -4,6 +4,8 @@
 
 # flake8: noqa
 
+from .. import __version__
+
 from .basecommand import BaseCommand
 
 from .apicommand import ApiCommand
