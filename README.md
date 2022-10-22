@@ -1,5 +1,7 @@
 # hallo-eltern-cli
 
+[![Tests](https://github.com/somechris/hallo-eltern-cli/workflows/Tests/badge.svg)](https://github.com/somechris/hallo-eltern-cli/actions?query=workflow%3ATests)
+
 `hallo-eltern-cli` is a command-line/Python/email interface for
 [Education Group GmbH](https://www.edugroup.at/)'s
 "[Hallo!Eltern](https://hallo-eltern.klassenpinnwand.at/)" application
