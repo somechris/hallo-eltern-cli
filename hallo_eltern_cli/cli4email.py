@@ -19,9 +19,6 @@ def parse_arguments():
                         default='stdout',
                         choices=['procmail', 'stdout'],
                         help='where to pipe generated emails to')
-    parser.add_argument('--data-file',
-                        help='load message data from this file instead of '
-                        'querying the live API instance')
     parser.add_argument('--process-all',
                         action='store_true',
                         help='process all (even already seen) messages')
