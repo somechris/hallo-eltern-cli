@@ -32,7 +32,7 @@ def parse_arguments():
 
 
 class HalloElternApp4Email(object):
-    def __init__(self, config):
+    def __init__(self, args, config):
         self._config = config
         self._api = Api(self._config)
         seen_ids_file = config.get('base', 'seen-ids-file')
@@ -96,7 +96,7 @@ def run():
     else:
         raise RuntimeError(f"Unknown mode '{args.mode}'")
 
-    hea4e = HalloElternApp4Email(config)
+    hea4e = HalloElternApp4Email(args, config)
     hea4e.run(mda)
 
 
