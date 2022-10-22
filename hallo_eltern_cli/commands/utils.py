@@ -2,6 +2,9 @@
 # Apache License Version 2.0 (See LICENSE.txt)
 # SPDX-License-Identifier: Apache-2.0
 
+import argparse
+
+
 def guess_command_name(cls):
     """Guess the inteded command name from the class name"""
     command_name = cls.__name__.lower()
@@ -12,6 +15,8 @@ def guess_command_name(cls):
 
 def register_command_class(cls, subparsers, help):
     command_name = guess_command_name(cls)
-    parser = subparsers.add_parser(command_name, help=help)
+    parser = subparsers.add_parser(
+        command_name, help=help,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.set_defaults(command=cls)
     return parser
