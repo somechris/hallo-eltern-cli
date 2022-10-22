@@ -7,6 +7,8 @@ import configparser
 import logging
 import os
 
+from . import __version__
+
 CONFIG_DIR = os.path.join(
     os.path.expanduser('~'), '.config', 'hallo-eltern-cli')
 CACHE_DIR = os.path.join(
@@ -16,7 +18,7 @@ DEFAULT_CONFIG = """
 email=foo@example.org
 password=bar
 base_url=https://hallo-api.klassenpinnwand.at/edugroup/api/v1
-user-agent=hallo-eltern-cli/0.0.1
+user-agent=hallo-eltern-cli/{{VERSION}}
 
 [email]
 default-address=do-not-reply@example.org
@@ -29,7 +31,11 @@ seen-ids-file={{CONFIG_DIR}}/seen-ids.json
 [development]
 development-mode=False
 cache-dir={{CACHE_DIR}}/api-development
-""".replace('{{CONFIG_DIR}}', CONFIG_DIR).replace('{{CACHE_DIR}}', CACHE_DIR)
+"""\
+    .replace('{{CONFIG_DIR}}', CONFIG_DIR)\
+    .replace('{{CACHE_DIR}}', CACHE_DIR)\
+    .replace('{{VERSION}}', __version__)\
+
 
 
 LOG_FORMAT = ('%(asctime)s.%(msecs)03d %(levelname)-5s [%(threadName)s] '

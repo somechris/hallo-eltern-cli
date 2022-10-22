@@ -4,6 +4,8 @@
 
 # flake8: noqa
 
+__version__ = '0.1.2-alpha.0'
+
 # Scaffolding functions
 from .common import get_config
 from .common import get_argument_parser
