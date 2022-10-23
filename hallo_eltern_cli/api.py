@@ -17,42 +17,37 @@ logger = logging.getLogger(__name__)
 class Api(object):
     def __init__(self, config):
         self._config = config
-        self._login_response = {}
+        self._session = requests.Session()
+        self._drop_state()
+        self._session.headers.update({
+                'user-agent': self._get_config('user-agent'),
+                })
 
     def _get_config(self, key):
         return self._config.get('api', key)
 
-    def _compute_headers(self, custom_headers={}):
-        ret = {
-            'user-agent': self._get_config('user-agent'),
-            }
-
-        if 'userid' in self._login_response:
-            ret['mogree-Access-Id'] = str(self._login_response['userid'])
-
-        if 'auth_token' in self._login_response:
-            auth_token = self._login_response['auth_token']
-            ret['Cookie'] = f"mogree-Access-Token-Parent={auth_token}"
-
-        if custom_headers:
-            for k, v in custom_headers.items():
-                ret[k] = v
-        return ret
-
     def get_timestamp(self):
         return int(datetime.now(timezone.utc).timestamp())
+
+    def _drop_state(self):
+        self._login_response = {}
+        self._session.headers.update({
+                'mogree-Access-Id': None
+                })
+        self._session.cookies.clear()
 
     def _raw_request(self, method, url, headers, parameters, binary):
         logger.debug(f'api request {method} to url: {url}\n'
                      f'headers: {headers}\n'
                      f'parameters: {parameters}')
 
+        session = self._session
         if method == 'GET':
-            requests_method = requests.get
+            requests_method = session.get
         elif method == 'POST':
-            requests_method = requests.post
+            requests_method = session.post
         elif method == 'PUT':
-            requests_method = requests.put
+            requests_method = session.put
         else:
             raise RuntimeError(f"Unknown method '{method}'")
 
@@ -125,8 +120,6 @@ class Api(object):
                     f'Path {path} starts with neither / nor {base_url}')
             url = path
 
-        headers = self._compute_headers(custom_headers=headers)
-
         if self._config.getboolean('development', 'development-mode'):
             response_raw = self._cache_filled_raw_request(
                 method, url, headers, parameters, binary)
@@ -175,7 +168,8 @@ class Api(object):
             authenticated=authenticated, binary=binary)
 
     def authenticate(self):
-        self._login_response = {}
+        self._drop_state()
+
         headers = {
             'mail': self._get_config('email'),
             'password': self._get_config('password'),
@@ -183,6 +177,29 @@ class Api(object):
 
         self._login_response = self._post(
             '/account/login', headers=headers, authenticated=False)
+
+        self._session.headers.update({
+                'mogree-Access-Id': str(self._login_response['userid']),
+                })
+        # While the session picks up the cookies automatically for us, the
+        # relevant Cookie response header (on 2022-10-22) contains 'Path'
+        # twice. E.g.:
+        #   Set-Cookie: mogree-Access-Token-Parent=[...];Path=;Path=/;[...]
+        # The requests library picks up only the first Path (which is empty)
+        # and follows RFC 6265. Hence, the default-path (~ directory of the
+        # request) is assumed. So it does not match follow-up requests and
+        # would not get used.
+        # So we have to patch the cookie, to make sure `/` (i.e.: the second
+        # Path parameter) gets used a the cookie's path. This allows the
+        # cookie to get used for the follow-up requests
+        auth_token = self._login_response['auth_token']
+        for cookie in self._session.cookies:
+            if cookie.name == 'mogree-Access-Token-Parent' \
+                    and cookie.value == auth_token:
+                # We've found the cookie with correct name and value.
+                # Now we can to patch it's path to apply for the whole site.
+                cookie.path = '/'
+
         return self._login_response
 
     def get_authenticated_user(self):
