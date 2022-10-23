@@ -4,7 +4,7 @@
 
 # flake8: noqa
 
-__version__ = '0.1.2-alpha.0'
+__version__ = '1.0.0'
 
 # Scaffolding functions
 from .common import get_config

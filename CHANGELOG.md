@@ -1,5 +1,7 @@
 # Unreleased
 
+### [1.0.0](https://github.com/somechris/hallo-eltern-cli/releases/tag/v1.0.0) (2022-10-23)
+
 * Breaking Change: Move `hallo-eltern4email` script into cli as `mta` command
 * Enhancement: Use dynamic version in `User-Agent` header
 * Enhancement: Show defaults in command specific help pages
