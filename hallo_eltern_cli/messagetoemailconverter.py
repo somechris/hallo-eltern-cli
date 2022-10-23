@@ -119,7 +119,7 @@ class MessageToEmailConverter(object):
         message_content = json.loads('"' + content_json_string + '"')
         email.set_content(message_content)
 
-        if 'link' in message:
+        if 'link' in message and embed_attachments:
             filename = message.get('filename_client', 'attachment')
             ending = ('.' + filename).rsplit('.', 1)[1].lower()
             mime_type = 'application/octet-stream'
