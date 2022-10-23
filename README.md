@@ -67,12 +67,11 @@ The CLI offers the following commands:
 
 ## Email integration
 
-`hallo-eltern-cli` comes with `hallo-eltern4email` which allows to
-format messages as emails (containing the full message's text and
-attachments) and submit them to a mail delivery agent (MDA,
-e.g. `procmail`). To run it for example 12 minutes into every hour,
-simply add a crontab entry like:
+The `mda` mode of `hallo-eltern-cli` allows to format messages as
+emails (containing the full message's text and attachments) and submit
+them to a mail delivery agent (MDA, e.g. `procmail`). To run it for
+example 12 minutes into every hour, simply add a crontab entry like:
 
 ```
-12 * * * * /path/to/hallo-eltern4email mta --mda=procmail
+12 * * * * /path/to/hallo-eltern-cli mta --mda=procmail
 ```
