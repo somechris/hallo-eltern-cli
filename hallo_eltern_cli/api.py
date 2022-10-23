@@ -39,6 +39,8 @@ class Api(object):
     def _raw_request(self, method, url, headers, parameters, binary):
         logger.debug(f'api request {method} to url: {url}\n'
                      f'headers: {headers}\n'
+                     f'session.headers: {self._session.headers}\n'
+                     f'session.cookies: {self._session.cookies.get_dict()}\n'
                      f'parameters: {parameters}')
 
         session = self._session
@@ -55,6 +57,8 @@ class Api(object):
         content = response.content
 
         logger.debug(f'response status code: {response.status_code}\n'
+                     f'response.request.headers: {response.request.headers}\n'
+                     f'response.headers: {response.headers}\n'
                      'response:\n'
                      f"{'<<binary data>>' if binary else content.decode()}")
 
