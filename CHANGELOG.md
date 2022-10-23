@@ -1,5 +1,6 @@
 # Unreleased
 
+* Enhancement: Add `--version` argument
 * Enhancement: Add `version` command
 
 ### [1.0.0](https://github.com/somechris/hallo-eltern-cli/releases/tag/v1.0.0) (2022-10-23)

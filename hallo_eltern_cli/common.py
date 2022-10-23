@@ -69,6 +69,9 @@ def get_argument_parser(description):
                         default=0,
                         action='count',
                         help='increase verbosity')
+    parser.add_argument('--version',
+                        action='store_true',
+                        help='print the version and exit')
     return parser
 
 
