@@ -82,6 +82,9 @@ class BasicTestCase(unittest.TestCase):
         actual = self.get_json_file_contents(file_name)
         self.assertEqual(actual, expected)
 
+    def assertEmptyString(self, actual):
+        self.assertEqual(actual, '')
+
 
 class CanaryTestCase(BasicTestCase):
     def run_command(self, command, expected_returncode=0):

@@ -17,3 +17,4 @@ from .closecommand import CloseCommand
 from .opencommand import OpenCommand
 from .configcommand import ConfigCommand
 from .mtacommand import MTACommand
+from .versioncommand import VersionCommand
