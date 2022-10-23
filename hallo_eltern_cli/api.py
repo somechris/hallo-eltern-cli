@@ -2,6 +2,7 @@
 # Apache License Version 2.0 (See LICENSE.txt)
 # SPDX-License-Identifier: Apache-2.0
 
+import collections.abc
 import copy
 import json
 import os
@@ -110,6 +111,17 @@ class Api(object):
 
         return content
 
+    def _extra_decode(self, data):
+        if isinstance(data, collections.abc.Mapping):
+            for key, value in data.items():
+                data[key] = self._extra_decode(value)
+        elif isinstance(data, list):
+            data = [self._extra_decode(item) for item in data]
+        elif isinstance(data, str):
+            tmp = data.replace('\n', '\\n')
+            data = json.loads('"' + tmp + '"')
+        return data
+
     def _request(self, method, path, headers={}, parameters={},
                  authenticated=True, binary=False):
         if authenticated and not self._login_response:
@@ -135,6 +147,16 @@ class Api(object):
             ret = response_raw
         else:
             response = json.loads(response_raw)
+
+            # Sometimes (but not always), `title` and `message` fields are
+            # double encoded. E.g.: Message 2811194 has neither `title` nor
+            # `message` double encoded. But 2877226 has its `title` and
+            # 2860389 its `message` double encoded.
+            # We fail to find a good heuristics of when which fields get
+            # double encoded. So we double decode all string values. This will
+            # falsely double decode a few outliers, but should get double
+            # encoding undone while not distorting too many other messages.
+            response = self._extra_decode(response)
 
             if response['statuscode'] != 200:
                 raise RuntimeError(
