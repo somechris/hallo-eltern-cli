@@ -9,8 +9,6 @@ class StdoutCommand(EmailCommand):
     def __init__(self, args, config):
         super(StdoutCommand, self).__init__(args, config)
 
-        self._process_all = args.process_all
-
         self._separator = args.separator
         self._processed_count = 0
 
@@ -21,10 +19,6 @@ class StdoutCommand(EmailCommand):
     @classmethod
     def register_options(cls, parser):
         super(StdoutCommand, cls).register_options(parser)
-
-        parser.add_argument('--process-all',
-                            action='store_true',
-                            help='process all (even already seen) messages')
 
         parser.add_argument('--separator',
                             help='separator to print between messages')

@@ -17,7 +17,15 @@ class EmailCommand(ApiCommand):
         self._converter = MessageToEmailConverter(
             self._config, self._api.get_authenticated_user(), self._api)
 
-        self._process_all = False
+        self._process_all = args.process_all
+
+    @classmethod
+    def register_options(cls, parser):
+        super(EmailCommand, cls).register_options(parser)
+
+        parser.add_argument('--process-all',
+                            action='store_true',
+                            help='process all (even already seen) messages')
 
     def _get_store_id_for_message(self, message):
         confirmed_status = 'confirmed' if 'confirmed_by' in message \

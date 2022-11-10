@@ -11,8 +11,6 @@ class MdaCommand(EmailCommand):
     def __init__(self, args, config):
         super(MdaCommand, self).__init__(args, config)
 
-        self._process_all = args.process_all
-
         self._mda_command = args.mda_command
 
     @classmethod
@@ -23,10 +21,6 @@ class MdaCommand(EmailCommand):
     @classmethod
     def register_options(cls, parser):
         super(MdaCommand, cls).register_options(parser)
-
-        parser.add_argument('--process-all',
-                            action='store_true',
-                            help='process all (even already seen) messages')
 
         parser.add_argument('--mda-command',
                             default='/usr/bin/procmail',
