@@ -2,10 +2,10 @@
 # Apache License Version 2.0 (See LICENSE.txt)
 # SPDX-License-Identifier: Apache-2.0
 
-from . import EmailCommand
+from . import EmailProcessorCommand
 
 
-class StdoutCommand(EmailCommand):
+class StdoutCommand(EmailProcessorCommand):
     def __init__(self, args, config):
         super(StdoutCommand, self).__init__(args, config)
 

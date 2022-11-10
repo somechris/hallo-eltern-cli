@@ -2,16 +2,10 @@
 # Apache License Version 2.0 (See LICENSE.txt)
 # SPDX-License-Identifier: Apache-2.0
 
-from . import ApiCommand
-from hallo_eltern_cli import MessageToEmailConverter
+from . import EmailCommand
 
 
-class ShowCommand(ApiCommand):
-    def __init__(self, args, config):
-        super(ShowCommand, self).__init__(args, config)
-        self._message_converter = MessageToEmailConverter(
-            self._config, self._api.get_authenticated_user())
-
+class ShowCommand(EmailCommand):
     @classmethod
     def get_help(cls):
         return 'shows a message'

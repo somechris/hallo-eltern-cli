@@ -4,10 +4,10 @@
 
 import subprocess
 
-from . import EmailCommand
+from . import EmailProcessorCommand
 
 
-class MdaCommand(EmailCommand):
+class MdaCommand(EmailProcessorCommand):
     def __init__(self, args, config):
         super(MdaCommand, self).__init__(args, config)
 

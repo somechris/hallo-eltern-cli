@@ -10,6 +10,7 @@ from .basecommand import BaseCommand
 
 from .apicommand import ApiCommand
 from .emailcommand import EmailCommand
+from .emailprocessorcommand import EmailProcessorCommand
 
 from .listcommand import ListCommand
 from .showcommand import ShowCommand
