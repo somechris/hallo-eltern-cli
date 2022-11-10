@@ -1,6 +1,7 @@
 # Unreleased
 
 * Breaking Change: Split `mta` command into `stdout` and `mda` commands
+* Enhancement: Add `--separator` to `stdout` command
 * Enhancement: Add `--version` argument
 * Enhancement: Add `version` command
 
