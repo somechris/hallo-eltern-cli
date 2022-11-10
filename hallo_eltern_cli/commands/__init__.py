@@ -9,6 +9,7 @@ from .. import __version__
 from .basecommand import BaseCommand
 
 from .apicommand import ApiCommand
+from .emailcommand import EmailCommand
 
 from .listcommand import ListCommand
 from .showcommand import ShowCommand
@@ -16,5 +17,6 @@ from .testcommand import TestCommand
 from .closecommand import CloseCommand
 from .opencommand import OpenCommand
 from .configcommand import ConfigCommand
-from .mtacommand import MTACommand
+from .stdoutcommand import StdoutCommand
+from .mdacommand import MdaCommand
 from .versioncommand import VersionCommand

@@ -63,7 +63,8 @@ The CLI offers the following commands:
 * `close` marks a message as closed
 * `config` updates and dumps the configuration
 * `test` tests the configured user againts the API
-* `mta` forwards messages as emails
+* `stdout` dumps messages to stdout
+* `mda` feeds messages into procmail
 
 ## Email integration
 
@@ -73,5 +74,5 @@ them to a mail delivery agent (MDA, e.g. `procmail`). To run it for
 example 12 minutes into every hour, simply add a crontab entry like:
 
 ```
-12 * * * * /path/to/hallo-eltern-cli mta --mda=procmail
+12 * * * * /path/to/hallo-eltern-cli mda
 ```

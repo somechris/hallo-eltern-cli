@@ -18,7 +18,8 @@ COMMAND_CLASSES = [
     commands.CloseCommand,
     commands.ConfigCommand,
     commands.TestCommand,
-    commands.MTACommand,
+    commands.MdaCommand,
+    commands.StdoutCommand,
     commands.VersionCommand,
     ]
 DEFAULT_COMMAND_CLASS = commands.ListCommand

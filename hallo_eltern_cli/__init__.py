@@ -4,7 +4,7 @@
 
 # flake8: noqa
 
-__version__ = '1.0.1-alpha.0'
+__version__ = '1.1.0-alpha.0'
 
 # Scaffolding functions
 from .common import get_config
@@ -15,9 +15,3 @@ from .common import handle_parsed_default_args
 from .api import Api
 from .idstore import IdStore
 from .messagetoemailconverter import MessageToEmailConverter
-
-# MDAs
-from .mda import MDA
-
-from .procmailmda import ProcmailMDA
-from .stdoutmda import StdoutMDA

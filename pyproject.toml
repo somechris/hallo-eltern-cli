@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "hallo-eltern-cli"
-version = "1.0.1-alpha.0"
+version = "1.1.0-alpha.0"
 description = "Command-line/Python/Email interface for 'Hallo!Eltern' app for Upper-Austrian schools"
 authors = ["Christian Aistleitner <christian@quelltextlich.at>"]
 license = "Apache-2.0"

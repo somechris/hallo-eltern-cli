@@ -3,29 +3,13 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from hallo_eltern_cli import IdStore, MessageToEmailConverter
-from hallo_eltern_cli import ProcmailMDA, StdoutMDA
 
 from . import ApiCommand
 
-from .utils import register_command_class
 
-
-class MTACommand(ApiCommand):
-    @classmethod
-    def register_subparser(cls, subparsers):
-        parser = register_command_class(
-            cls, subparsers, 'forwards messages as emails')
-
-        parser.add_argument('--mda',
-                            default='stdout',
-                            choices=['procmail', 'stdout'],
-                            help='where to pipe generated emails to')
-        parser.add_argument('--process-all',
-                            action='store_true',
-                            help='process all (even already seen) messages')
-
+class EmailCommand(ApiCommand):
     def __init__(self, args, config):
-        super(MTACommand, self).__init__(args, config)
+        super(EmailCommand, self).__init__(args, config)
 
         seen_ids_file = config.get('base', 'seen-ids-file')
         self._seen_ids_store = IdStore(seen_ids_file)
@@ -33,26 +17,20 @@ class MTACommand(ApiCommand):
         self._converter = MessageToEmailConverter(
             self._config, self._api.get_authenticated_user(), self._api)
 
-        if args.mda == 'procmail':
-            self._mda = ProcmailMDA()
-        elif args.mda == 'stdout':
-            self._mda = StdoutMDA()
-        else:
-            raise RuntimeError(f"Unknown mda '{args.mda}'")
-
-        self._process_all = args.process_all
+        self._process_all = False
 
     def _get_store_id_for_message(self, message):
         confirmed_status = 'confirmed' if 'confirmed_by' in message \
             else 'unconfirmed'
         return f"{message['itemid']}-{confirmed_status}"
 
-    def deliver(self, message, extra_data, parent=None):
+    def _process_message(self, message, extra_data, parent=None):
         store_id = self._get_store_id_for_message(message)
         if self._process_all or store_id not in self._seen_ids_store:
             email = self._converter.convert(message, extra_data, parent,
                                             embed_attachments=True)
-            self._mda.deliver(email)
+
+            self.process_email(email)
 
             if parent:
                 message_title = f"Re: {parent['title']}"
@@ -78,9 +56,14 @@ class MTACommand(ApiCommand):
                 id = abstract['itemid']
                 message = self._api.get_message(id, child_code)
 
-                self.deliver(message, extra_data)
+                self._process_message(message, extra_data)
                 for answer in message['answers']:
                     if answer['message']:
-                        self.deliver(answer, extra_data, parent=message)
+                        self._process_message(
+                            answer, extra_data, parent=message)
 
         self._seen_ids_store.persist()
+
+    def process_email(self, email):
+        raise NotImplementedError(
+            'Please implement this fuction in your subclass')
