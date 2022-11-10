@@ -64,7 +64,7 @@ The CLI offers the following commands:
 * `config` updates and dumps the configuration
 * `test` tests the configured user againts the API
 * `stdout` dumps messages to stdout
-* `mda` feeds messages into procmail
+* `mda` feeds messages into a message delivery agend (procmail, maildrop, ...)
 
 ## Email integration
 
