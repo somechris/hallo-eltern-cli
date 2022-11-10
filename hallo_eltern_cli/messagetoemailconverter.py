@@ -10,12 +10,15 @@ from email.message import EmailMessage
 
 
 class MessageToEmailConverter(object):
-    def __init__(self, config, authenticated_user, api=None):
+    def __init__(self, config, authenticated_user, api=None,
+                 forced_address=None):
         self._config = config
         self._message_id_domain = self._config.get('email', 'default-address')\
             .rsplit('@', 1)[1]
         self._authenticated_user = authenticated_user
         self._api = api
+        self._forced_address = forced_address if forced_address is not None \
+            else self._config.get('email', 'forced-address', fallback=None)
 
     def get_datetime(self):
         return datetime.now(timezone.utc)
@@ -33,10 +36,11 @@ class MessageToEmailConverter(object):
             first_name = self._authenticated_user['firstname']
             last_name = self._authenticated_user['lastname']
             name = f'{first_name} {last_name}'
-            address = self._authenticated_user['mail']
+            address = self._forced_address or self._authenticated_user['mail']
         else:
             name = data['title']
-            address = self._config.get('email', 'default-address')
+            address = self._forced_address or \
+                self._config.get('email', 'default-address')
         return f'{name} <{address}>'
 
     def _build_to_header(self, message):

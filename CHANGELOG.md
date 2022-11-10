@@ -1,6 +1,7 @@
 # Unreleased
 
 * Breaking Change: Split `mta` command into `stdout` and `mda` commands
+* Enhancement: Add `--force-address` to email generating commands
 * Enhancement: Add `--mda-command` to `mda` command
 * Enhancement: Add `--separator` to `stdout` command
 * Enhancement: Add `--version` argument

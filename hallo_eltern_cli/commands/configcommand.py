@@ -34,6 +34,10 @@ class ConfigCommand(BaseCommand):
             'NOTE THAT THE PASSWORD WILL BE STORED AS PLAIN TEXT IN THE '
             'CONFIG FILE. DO NOT USE THIS UNLESS YOU USE EXTERNAL ENCRYPTION'
             'METHODS!')
+        parser.add_argument(
+            '--force-address', help='Sets the To and From of generated emails '
+            'to this value. Set this to your own email address to generate '
+            'emails for submission to your email server.')
 
     def _store_if_set(self, value, config, section, option):
         if value:
@@ -73,6 +77,8 @@ class ConfigCommand(BaseCommand):
 
         self._store_if_set(self._args.password, config, 'api', 'password')
         self._store_if_set(self._args.email, config, 'api', 'email')
+        self._store_if_set(
+            self._args.force_address, config, 'email', 'forced-address')
 
         if self._args.dump:
             self.dump(config, blank=True)

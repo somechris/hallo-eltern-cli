@@ -87,6 +87,38 @@ class CliConfigCommandTestCase(CliCanaryTestCase):
                 },
                 )
 
+    def test_config_non_existing_forced_address(self):
+        with self.prepared_environment() as dir:
+            config_file = os.path.join(dir, 'config')
+            self.run_config_command(
+                ['--force-address', 'foo@example.org'],
+                config_file=config_file)
+
+            self.assertConfigFileIs(
+                config_file,
+                {'email': {'forced-address': 'foo@example.org'}},
+                )
+
+    def test_config_existing_forced_address(self):
+        fixture = 'config-simple'
+        with self.prepared_environment(fixture) as dir:
+            config_file = os.path.join(dir, fixture, 'config')
+            self.run_config_command(
+                ['--force-address', 'bar@example.org'],
+                config_file=config_file)
+
+            self.assertConfigFileIs(
+                config_file,
+                {
+                    'api': {
+                        'email': 'bar',
+                        'password': 'SECRET',
+                        'quux': 'quuux'},
+                    'email': {'forced-address': 'bar@example.org'},
+                    'foo': {'bar': 'quux'},
+                },
+                )
+
     def test_config_non_existing_param_password(self):
         with self.prepared_environment() as dir:
             config_file = os.path.join(dir, 'config')
