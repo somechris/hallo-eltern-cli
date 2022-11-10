@@ -63,8 +63,9 @@ The CLI offers the following commands:
 * `close` marks a message as closed
 * `config` updates and dumps the configuration
 * `test` tests the configured user againts the API
-* `stdout` dumps messages to stdout
 * `mda` feeds messages into a message delivery agend (procmail, maildrop, ...)
+* `stdout` dumps messages to stdout
+* `version` prints the version number
 
 ## Email integration
 
