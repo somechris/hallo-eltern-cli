@@ -3,14 +3,16 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from . import ApiCommand
-from .utils import register_command_class
 
 
 class OpenCommand(ApiCommand):
     @classmethod
-    def register_subparser(cls, subparsers):
-        parser = register_command_class(
-            cls, subparsers, 'marks a message as opens')
+    def get_help(cls):
+        return 'marks a message as open'
+
+    @classmethod
+    def register_options(cls, parser):
+        super(OpenCommand, cls).register_options(parser)
 
         parser.add_argument('id', help='The id of the message to open')
 

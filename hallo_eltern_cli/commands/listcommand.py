@@ -3,14 +3,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from . import ApiCommand
-from .utils import register_command_class
 
 
 class ListCommand(ApiCommand):
     @classmethod
-    def register_subparser(cls, subparsers):
-        register_command_class(
-            cls, subparsers, 'lists available messages')
+    def get_help(cls):
+        return 'lists available messages'
 
     def print_pinboard_header(self, pinboard):
         id = pinboard['itemid']

@@ -3,6 +3,7 @@
 # Apache License Version 2.0 (See LICENSE.txt)
 # SPDX-License-Identifier: Apache-2.0
 
+import argparse
 import logging
 
 from . import get_argument_parser, handle_parsed_default_args
@@ -25,14 +26,28 @@ COMMAND_CLASSES = [
 DEFAULT_COMMAND_CLASS = commands.ListCommand
 
 
+def guess_command_name(cls):
+    """Guess the inteded command name from the class name"""
+    command_name = cls.__name__.lower()
+    if command_name.endswith('command'):
+        command_name = command_name[0:-7]
+    return command_name
+
+
 def parse_arguments():
     parser = get_argument_parser(
         description='Simple CLI interface for Hallo-Eltern-App')
 
     subparsers = parser.add_subparsers(
         title='commands', description='available commands')
-    for command_class in COMMAND_CLASSES:
-        command_class.register_subparser(subparsers)
+    for cls in COMMAND_CLASSES:
+        name = guess_command_name(cls)
+        subparser = subparsers.add_parser(
+            name, help=cls.get_help(),
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        subparser.set_defaults(command=cls)
+
+        cls.register_options(subparser)
 
     args = parser.parse_args()
 

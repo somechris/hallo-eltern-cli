@@ -6,8 +6,6 @@ import subprocess
 
 from . import EmailCommand
 
-from .utils import register_command_class
-
 
 class MdaCommand(EmailCommand):
     def __init__(self, args, config):
@@ -18,11 +16,13 @@ class MdaCommand(EmailCommand):
         self._mda_command = args.mda_command
 
     @classmethod
-    def register_subparser(cls, subparsers):
-        parser = register_command_class(
-            cls, subparsers,
-            'feeds messages into a message delivery agent '
-            '(procmail, maildrop, ...)')
+    def get_help(cls):
+        return 'feeds messages into a message delivery agent (procmail, ' + \
+            'maildrop, ...)'
+
+    @classmethod
+    def register_options(cls, parser):
+        super(MdaCommand, cls).register_options(parser)
 
         parser.add_argument('--process-all',
                             action='store_true',

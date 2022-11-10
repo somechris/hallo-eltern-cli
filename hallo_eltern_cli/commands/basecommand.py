@@ -11,9 +11,13 @@ class BaseCommand(object):
         print('---------------------------------------------------')
 
     @classmethod
-    def register_subparser(cls, subparsers):
+    def get_help(cls):
         raise NotImplementedError(
             'Please implement this fuction in your subclass')
+
+    @classmethod
+    def register_options(cls, parser):
+        pass
 
     def run(self):
         raise NotImplementedError(

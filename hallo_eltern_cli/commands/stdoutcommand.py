@@ -4,8 +4,6 @@
 
 from . import EmailCommand
 
-from .utils import register_command_class
-
 
 class StdoutCommand(EmailCommand):
     def __init__(self, args, config):
@@ -17,9 +15,12 @@ class StdoutCommand(EmailCommand):
         self._processed_count = 0
 
     @classmethod
-    def register_subparser(cls, subparsers):
-        parser = register_command_class(
-            cls, subparsers, 'dumps messages to stdout')
+    def get_help(cls):
+        return 'dumps messages to stdout'
+
+    @classmethod
+    def register_options(cls, parser):
+        super(StdoutCommand, cls).register_options(parser)
 
         parser.add_argument('--process-all',
                             action='store_true',

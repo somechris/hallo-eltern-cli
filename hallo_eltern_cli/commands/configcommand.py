@@ -9,14 +9,17 @@ import sys
 from hallo_eltern_cli import get_config
 
 from . import BaseCommand
-from .utils import register_command_class
 
 
 class ConfigCommand(BaseCommand):
     @classmethod
-    def register_subparser(cls, subparsers):
-        parser = register_command_class(
-            cls, subparsers, 'updates configuration')
+    def get_help(cls):
+        return 'updates configuration'
+
+    @classmethod
+    def register_options(cls, parser):
+        super(ConfigCommand, cls).register_options(parser)
+
         parser.add_argument(
             '--dump', action='store_true',
             help='Prints the config to stdout. Passwords will get blanked.')

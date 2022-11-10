@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from . import ApiCommand
-from .utils import register_command_class
 from hallo_eltern_cli import MessageToEmailConverter
 
 
@@ -14,9 +13,13 @@ class ShowCommand(ApiCommand):
             self._config, self._api.get_authenticated_user())
 
     @classmethod
-    def register_subparser(cls, subparsers):
-        parser = register_command_class(
-            cls, subparsers, 'shows a message')
+    def get_help(cls):
+        return 'shows a message'
+
+    @classmethod
+    def register_options(cls, parser):
+        super(ShowCommand, cls).register_options(parser)
+
         parser.add_argument('id', help='The id of the message to show')
 
     def print_header(self, email, header):

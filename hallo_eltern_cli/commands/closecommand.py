@@ -3,16 +3,18 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from . import ApiCommand
-from .utils import register_command_class
 
 
 class CloseCommand(ApiCommand):
     @classmethod
-    def register_subparser(cls, subparsers):
-        parser = register_command_class(
-            cls, subparsers, 'marks a message as closed')
+    def get_help(cls):
+        return 'marks a message as closed'
 
-        parser.add_argument('id', help='The id of the message to show')
+    @classmethod
+    def register_options(cls, parser):
+        super(CloseCommand, cls).register_options(parser)
+
+        parser.add_argument('id', help='The id of the message to close')
 
     def run(self):
         id = self._args.id
