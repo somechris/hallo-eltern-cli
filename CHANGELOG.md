@@ -2,6 +2,7 @@
 
 * Breaking Change: Split `mta` command into `stdout` and `mda` commands
 * Breaking Change: Require Python `>=3.7`
+* Enhancement: Add `help` command
 * Enhancement: Add `smtp` command
 * Enhancement: Add `--force-address` to email generating commands
 * Enhancement: Add `--mda-command` to `mda` command

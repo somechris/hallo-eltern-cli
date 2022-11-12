@@ -12,6 +12,7 @@ from .apicommand import ApiCommand
 from .emailcommand import EmailCommand
 from .emailprocessorcommand import EmailProcessorCommand
 
+from .helpcommand import HelpCommand
 from .listcommand import ListCommand
 from .showcommand import ShowCommand
 from .testcommand import TestCommand

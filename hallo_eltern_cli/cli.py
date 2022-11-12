@@ -19,12 +19,14 @@ COMMAND_CLASSES = [
     commands.CloseCommand,
     commands.ConfigCommand,
     commands.TestCommand,
+    commands.HelpCommand,
     commands.MdaCommand,
     commands.StdoutCommand,
     commands.SmtpCommand,
     commands.VersionCommand,
     ]
 DEFAULT_COMMAND_CLASS = commands.ListCommand
+HELP_COMMAND_CLASS = commands.HelpCommand
 
 
 def guess_command_name(cls):
@@ -51,6 +53,12 @@ def parse_arguments():
         cls.register_options(subparser)
 
     args = parser.parse_args()
+
+    # Since the `help` command needs the parser to produce the help message,
+    # but does not have access to it, we short-circuit here, and show the help
+    # page.
+    if ('command' in args and args.command == HELP_COMMAND_CLASS):
+        parser.print_help()
 
     return handle_parsed_default_args(args)
 
