@@ -25,7 +25,7 @@ full messages including attachments directly to your local inbox.
 
 ## Installation
 
-You need Python `>=3.6`
+You need Python `>=3.7`
 
 1. Install the package:
 
