@@ -107,6 +107,7 @@ and configure the email server to use in `$HOME/.config/hallo-eltern-cli/config`
     in your `$HOME/.config/hallo-eltern-cli/config` to:
 
     ```
+    [smtp]
     host = mail.gmx.net
     port = 587
     starttls = True
@@ -124,6 +125,7 @@ and configure the email server to use in `$HOME/.config/hallo-eltern-cli/config`
     to:
 
     ```
+    [smtp]
     host = smtp.office365.com
     port = 587
     starttls = True
