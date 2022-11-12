@@ -20,6 +20,8 @@ full messages including attachments directly to your local inbox.
 1. [Installation](#installation)
 1. [CLI Commands](#cli-commands)
 1. [Email Integration](#email-integration)
+    1. [Email server (SMTP)](#email-server-smtp)
+    1. [Mail Delivery Agent (MDA)](#mail-delivery-agent-mda)
 
 ## Installation
 
@@ -69,6 +71,71 @@ The CLI offers the following commands:
 * `version` prints the version number
 
 ## Email integration
+
+Simple ways to integrate `hallo-eltern-cli` with your email pipelines
+are to either
+
+* [forward the messages to an email server (SMTP)](#email-server-smtp)
+    (e.g.: gmx, office365, local server), or to
+* [pipe the messages to a message delivery agent
+    (MDA)](#mail-delivery-agent-mda) (e.g.: `procmail`, `maildrop`).
+
+### Email server (SMTP)
+
+The `smtp` mode of `hallo-eltern-cli` allows to send the messages
+(containing the full message's text and attachments) to an email
+server to get them to your usual email inbox.
+
+To run check for new messages and forward them to your inbox for
+example 12 minutes into every hour, simply add a crontab entry like:
+
+```
+12 * * * * /path/to/hallo-eltern-cli smtp --force-address your-email-address@example.org
+```
+
+and configure the email server to use in `$HOME/.config/hallo-eltern-cli/config`
+
+* Local SMTP server
+
+    The default configuration of `hallo-eltern-cli` is to submit to a
+    local SMTP server through `localhost:25`. So you do not need to add
+    any configuration.
+
+* GMX
+
+    To submit the messages to your GMX inbox, set the `[smtp]` section
+    in your `$HOME/.config/hallo-eltern-cli/config` to:
+
+    ```
+    host = mail.gmx.net
+    port = 587
+    starttls = True
+    user = your-email-address@gmx.at
+    password = your-secret-password
+    ```
+
+    (Note that the password gets stored in plain text, so secure your
+    config file through external means)
+
+* Office365 / Hotmail
+
+    To submit the messages to your Office365 or Hotmail inbox, set the
+    `[smtp]` section in your `$HOME/.config/hallo-eltern-cli/config`
+    to:
+
+    ```
+    host = smtp.office365.com
+    port = 587
+    starttls = True
+    user = your-email-address@hotmail.com
+    password = your-secret-password
+    ```
+
+    (Note that the password gets stored in plain text, so secure your
+    config file through external means)
+
+
+### Mail Delivery Agent (MDA)
 
 The `mda` mode of `hallo-eltern-cli` allows to format messages as
 emails (containing the full message's text and attachments) and submit
