@@ -22,7 +22,6 @@ pytest = "^5.2"
 
 [tool.poetry.scripts]
 hallo-eltern-cli = 'hallo_eltern_cli.cli:run'
-hallo-eltern4email = 'hallo_eltern_cli.cli4email:run'
 
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/somechris/hallo-eltern-cli/issues"
