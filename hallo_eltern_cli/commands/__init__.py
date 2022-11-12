@@ -20,4 +20,5 @@ from .opencommand import OpenCommand
 from .configcommand import ConfigCommand
 from .stdoutcommand import StdoutCommand
 from .mdacommand import MdaCommand
+from .smtpcommand import SmtpCommand
 from .versioncommand import VersionCommand

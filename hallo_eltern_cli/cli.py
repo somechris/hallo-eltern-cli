@@ -21,6 +21,7 @@ COMMAND_CLASSES = [
     commands.TestCommand,
     commands.MdaCommand,
     commands.StdoutCommand,
+    commands.SmtpCommand,
     commands.VersionCommand,
     ]
 DEFAULT_COMMAND_CLASS = commands.ListCommand

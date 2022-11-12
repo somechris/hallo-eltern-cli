@@ -65,6 +65,7 @@ The CLI offers the following commands:
 * `test` tests the configured user againts the API
 * `mda` feeds messages into a message delivery agend (procmail, maildrop, ...)
 * `stdout` dumps messages to stdout
+* `smtp` sends messages as emails
 * `version` prints the version number
 
 ## Email integration

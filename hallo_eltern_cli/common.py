@@ -32,6 +32,10 @@ seen-ids-file={{CONFIG_DIR}}/seen-ids.json
 [development]
 development-mode=False
 cache-dir={{CACHE_DIR}}/api-development
+
+[smtp]
+host = localhost
+port = 25
 """\
     .replace('{{CONFIG_DIR}}', CONFIG_DIR)\
     .replace('{{CACHE_DIR}}', CACHE_DIR)\
