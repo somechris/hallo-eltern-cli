@@ -1,5 +1,9 @@
 # Unreleased
 
+(no unreleased changes yet)
+
+### [1.1.0](https://github.com/somechris/hallo-eltern-cli/releases/tag/v1.1.0) (2022-11-15)
+
 * Breaking Change: Split `mta` command into `stdout` and `mda` commands
 * Breaking Change: Require Python `>=3.7`
 * Enhancement: Add `help` command
