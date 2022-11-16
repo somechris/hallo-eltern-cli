@@ -2,7 +2,6 @@
 # Apache License Version 2.0 (See LICENSE.txt)
 # SPDX-License-Identifier: Apache-2.0
 
-import json
 import socket
 
 from datetime import datetime, timezone
@@ -119,9 +118,7 @@ class MessageToEmailConverter(object):
         if 'school_name' in extra_data:
             email['X-HalloElternApp-School-Name'] = extra_data['school_name']
 
-        content_json_string = message['message'].replace('\n', '\\n')
-        message_content = json.loads('"' + content_json_string + '"')
-        email.set_content(message_content)
+        email.set_content(message['message'])
 
         if 'link' in message and embed_attachments:
             filename = message.get('filename_client', 'attachment')

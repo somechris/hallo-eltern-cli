@@ -105,7 +105,7 @@ class MessageToEmailConverterTestCase(BasicTestCase):
             'title': 'Bar',
             'date': '2022-10-01T12:13:14+0100',
             'itemid': '23',
-            'message': r'quux\nquuux\nf\u00FCr\nw\u00E4hrend',
+            'message': 'quux\nquuux\nf\u00FCr\nw\u00E4hrend',
             }
         actual = self.convertMessage(message)
         self.assertEqual(actual['From'], 'Jane Doe <foo@example.org>')
