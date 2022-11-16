@@ -1,6 +1,6 @@
 # Unreleased
 
-(no unreleased changes yet)
+* Fix: Correctly decode tabs from API responses
 
 ### [1.1.0](https://github.com/somechris/hallo-eltern-cli/releases/tag/v1.1.0) (2022-11-15)
 

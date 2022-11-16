@@ -118,8 +118,12 @@ class Api(object):
         elif isinstance(data, list):
             data = [self._extra_decode(item) for item in data]
         elif isinstance(data, str):
-            tmp = data.replace('\n', '\\n')
-            data = json.loads('"' + tmp + '"')
+            for (needle, replacement) in [
+                    ('\n', '\\n'),
+                    ('\t', '\\t'),
+                    ]:
+                data = data.replace(needle, replacement)
+            data = json.loads('"' + data + '"')
         return data
 
     def _request(self, method, path, headers={}, parameters={},
