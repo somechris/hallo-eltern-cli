@@ -51,12 +51,12 @@ class ApiTestCase(BasicTestCase):
 
     def test__extra_decode_data_string_LFs(self):
         api = self.create_api()
-        actual = api._extra_decode('f\n\u00FC\\n\\u00FCr')
-        self.assertEqual(actual, 'f\nü\nür')
+        actual = api._extra_decode('foo\nbar')
+        self.assertEqual(actual, 'foo\nbar')
 
     def test__extra_decode_data_string_TABs(self):
         api = self.create_api()
-        actual = api._extra_decode('col1\tcol2\\tcol3')
+        actual = api._extra_decode('col1\tcol2\tcol3')
         self.assertEqual(actual, 'col1	col2	col3')
 
     def test__extra_decode_data_list_plain(self):
