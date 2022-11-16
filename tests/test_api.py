@@ -49,7 +49,7 @@ class ApiTestCase(BasicTestCase):
         actual = api._extra_decode(r'f\u00FCr')
         self.assertEqual(actual, 'für')
 
-    def test__extra_decode_data_string_CRs(self):
+    def test__extra_decode_data_string_LFs(self):
         api = self.create_api()
         actual = api._extra_decode('f\n\u00FC\\n\\u00FCr')
         self.assertEqual(actual, 'f\nü\nür')
