@@ -118,8 +118,25 @@ class Api(object):
         elif isinstance(data, list):
             data = [self._extra_decode(item) for item in data]
         elif isinstance(data, str):
+            # The API returns Unicode characters outside the ASCII range
+            # double encoded. So for example 'ü' is not encoded as 'ü', or
+            # r'\u00FC', but as r'\\u00FC', which would then show up as
+            # r'\u00FC' (instead of 'ü') in the already decoded string. To
+            # catch all special characters, we do an extra decoding of the
+            # string.
+            # But to avoid issues with characters that JSON requires to be
+            # encoded, we encode them before the decoding step.
             for (needle, replacement) in [
+                    ('\\', '\\\\'),
+                    ('\\\\u', '\\u'),  # We want to decode r'\uXXXX' to
+                    # character XXXX, so we need to undo the escaping
+                    # of '\\' from the line above
+                    ('"', '\\"'),
+                    ('/', '\\/'),
+                    ('\b', '\\b'),
+                    ('\f', '\\f'),
                     ('\n', '\\n'),
+                    ('\r', '\\r'),
                     ('\t', '\\t'),
                     ]:
                 data = data.replace(needle, replacement)

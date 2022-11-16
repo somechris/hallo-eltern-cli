@@ -49,10 +49,40 @@ class ApiTestCase(BasicTestCase):
         actual = api._extra_decode(r'f\u00FCr')
         self.assertEqual(actual, 'für')
 
+    def test__extra_decode_data_string_quotes(self):
+        api = self.create_api()
+        actual = api._extra_decode('foo"bar')
+        self.assertEqual(actual, 'foo"bar')
+
+    def test__extra_decode_data_string_backslash(self):
+        api = self.create_api()
+        actual = api._extra_decode('foo\\bar')
+        self.assertEqual(actual, 'foo\\bar')
+
+    def test__extra_decode_data_string_slash(self):
+        api = self.create_api()
+        actual = api._extra_decode('foo/bar')
+        self.assertEqual(actual, 'foo/bar')
+
+    def test__extra_decode_data_string_backspace(self):
+        api = self.create_api()
+        actual = api._extra_decode('foo\bar')
+        self.assertEqual(actual, 'foo\bar')
+
+    def test__extra_decode_data_string_FFs(self):
+        api = self.create_api()
+        actual = api._extra_decode('foo\fbar')
+        self.assertEqual(actual, 'foo\fbar')
+
     def test__extra_decode_data_string_LFs(self):
         api = self.create_api()
         actual = api._extra_decode('foo\nbar')
         self.assertEqual(actual, 'foo\nbar')
+
+    def test__extra_decode_data_string_CRs(self):
+        api = self.create_api()
+        actual = api._extra_decode('foo\rbar')
+        self.assertEqual(actual, 'foo\rbar')
 
     def test__extra_decode_data_string_TABs(self):
         api = self.create_api()

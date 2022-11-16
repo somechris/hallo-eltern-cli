@@ -1,6 +1,6 @@
 # Unreleased
 
-* Fix: Correctly decode tabs from API responses
+* Fix: Decode special characters from json.org's escape list correctly
 
 ### [1.1.0](https://github.com/somechris/hallo-eltern-cli/releases/tag/v1.1.0) (2022-11-15)
 
