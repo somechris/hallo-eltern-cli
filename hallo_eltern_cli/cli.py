@@ -19,6 +19,7 @@ COMMAND_CLASSES = [
     commands.CloseCommand,
     commands.ConfigCommand,
     commands.TestCommand,
+    commands.LoginCommand,
     commands.HelpCommand,
     commands.MdaCommand,
     commands.StdoutCommand,

@@ -14,6 +14,7 @@ from .emailprocessorcommand import EmailProcessorCommand
 
 from .helpcommand import HelpCommand
 from .listcommand import ListCommand
+from .logincommand import LoginCommand
 from .showcommand import ShowCommand
 from .testcommand import TestCommand
 from .closecommand import CloseCommand
